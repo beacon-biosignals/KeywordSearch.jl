@@ -16,7 +16,6 @@ For example, if `KeywordSearch.AUTOMATIC_REPLACEMENTS == ["a" => "b"]`, then
 """
 const AUTOMATIC_REPLACEMENTS = Pair{String, String}[]
 
-include("match.jl")
 include("core.jl")
 include("corpus.jl")
 include("names.jl")

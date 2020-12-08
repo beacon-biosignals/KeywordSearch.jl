@@ -39,6 +39,13 @@ function process_punct(str::AbstractString)
     return replace(str, r"[.!?><\\-]" => " ")
 end
 
+struct QueryMatch{Q,H,D,I}
+    query::Q
+    haystack::H
+    distance::D
+    indices::I
+end
+
 abstract type AbstractQuery end
 
 struct Query <: AbstractQuery
