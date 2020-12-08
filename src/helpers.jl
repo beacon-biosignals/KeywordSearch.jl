@@ -49,15 +49,15 @@ Ensures that a word or phrase is not hyphenated or conjoined with the surroundin
 ```julia
 using KeywordSearch, Test, UUIDs
 query = Query("word")
-@test match(query, Report("This matchesword ", uuid4())) !== nothing
-@test match(word_boundary(query), Report("This matches word.", uuid4())) !== nothing
-@test match(word_boundary(query), Report("This matches word ", uuid4())) !== nothing
-@test match(word_boundary(query), Report("This matches word\nNext line", uuid4())) !== nothing
-@test match(word_boundary(query), Report("This doesn't matchword ", uuid4())) === nothing
+@test match(query, Document("This matchesword ", uuid4())) !== nothing
+@test match(word_boundary(query), Document("This matches word.", uuid4())) !== nothing
+@test match(word_boundary(query), Document("This matches word ", uuid4())) !== nothing
+@test match(word_boundary(query), Document("This matches word\nNext line", uuid4())) !== nothing
+@test match(word_boundary(query), Document("This doesn't matchword ", uuid4())) === nothing
 ```
 """
 function word_boundary(Q::AbstractQuery)
-    # `process_report` has removed punctuation, so we just need to check for spaces.
+    # `process_document` has removed punctuation, so we just need to check for spaces.
     make_q = reconstruct(Q)
     stripped_text = strip(Q.text)
     return make_q(string(" ", stripped_text, " "))
@@ -72,13 +72,13 @@ function check_keys(::Type{T}) where {T<:NamedTuple}
     return nothing
 end
 
-function disjoint_keys_check(::NamedQuery{T1}, ::Patient{T2,TR}) where {T1,T2,TR}
+function disjoint_keys_check(::NamedQuery{T1}, ::Corpus{T2,TR}) where {T1,T2,TR}
     disjoint_keys_check(T1, T2)
     disjoint_keys_check(T1, TR)
     return nothing
 end
 
-function disjoint_keys_check(::NamedQuery{T1}, ::Report{T2}) where {T1,T2}
+function disjoint_keys_check(::NamedQuery{T1}, ::Document{T2}) where {T1,T2}
     disjoint_keys_check(T1, T2)
     return nothing
 end

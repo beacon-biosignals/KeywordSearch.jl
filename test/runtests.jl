@@ -17,8 +17,8 @@ end
 ## Search robustness tests
 
 @testset "Mistake 1: misspellings" begin
-    @test match(FuzzyQuery("cobra"), Report("The cobre ate a mouse")) !== nothing
-    @test match(FuzzyQuery("macaque"), Report("The macqaue ate a crab")) !== nothing
+    @test match(FuzzyQuery("cobra"), Document("The cobre ate a mouse")) !== nothing
+    @test match(FuzzyQuery("macaque"), Document("The macqaue ate a crab")) !== nothing
 end
 
 @testset "Mistake 2: word conjunctions" begin
@@ -27,76 +27,76 @@ end
 
     # This one matches just by the edit distance
     @test match(FuzzyQuery(keyword),
-                Report(text)) !== nothing
+                Document(text)) !== nothing
 
     # It even matches exactly if we augment
     @test match(augment(Query(keyword)),
-                Report(text)) !== nothing
+                Document(text)) !== nothing
 end
 
 @testset "Mistakes 3, 4: hyphenated words conjoined without hyphen or missing hyphen (with space)" begin
     keyword = "giant golden-crowned flying fox"
-    # These match exactly due to removing punctuation in the reports
-    for report_text in
+    # These match exactly due to removing punctuation in the documents
+    for document_text in
         ("A giant golden crowned flying fox slept all day.", "A giant-golden-crowned flying fox slept all day.")
-        @test match(Query(keyword), Report(report_text)) !== nothing
+        @test match(Query(keyword), Document(document_text)) !== nothing
     end
 
     # These are 2 edits away, but appear to be 4 due to a possible bug
-    for report_text in
+    for document_text in
         ("A giantgolden crowned flyingfox slept all day.", "A giantgolden crownedflying fox slept all day.")
         @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 1),
-                    Report(report_text)) === nothing
+                    Document(document_text)) === nothing
 
         # https://github.com/matthieugomez/StringDistances.jl/issues/43
         @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 4),
-                    Report(report_text)) !== nothing
+                    Document(document_text)) !== nothing
 
-        @test match(augment(Query(keyword)), Report(report_text)) !== nothing
-        @test match(augment(FuzzyQuery(keyword)), Report(report_text)) !==
+        @test match(augment(Query(keyword)), Document(document_text)) !== nothing
+        @test match(augment(FuzzyQuery(keyword)), Document(document_text)) !==
               nothing
     end
 
     # This one seems like 3 edits away, but since the same substring can't be edited more than once via the
     # "restricted edit distance" used by `DamerauLevenshtein()`, it comes out as 6 edits.
-    report_text = "A giant goldencrownedflying fox slept all day."
+    document_text = "A giant goldencrownedflying fox slept all day."
     keyword = "giant golden-crowned flying fox"
     @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 1),
-                Report(report_text)) === nothing
+                Document(document_text)) === nothing
     @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 2),
-                Report(report_text)) === nothing
+                Document(document_text)) === nothing
     @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 6),
-                Report(report_text)) !== nothing
+                Document(document_text)) !== nothing
 
-    # report_text = "A giant goldencrownedflying fox slept all day."
+    # document_text = "A giant goldencrownedflying fox slept all day."
 
-    @test match(augment(Query(keyword)), Report(report_text)) !== nothing
-    @test match(augment(FuzzyQuery(keyword)), Report(report_text)) !== nothing
+    @test match(augment(Query(keyword)), Document(document_text)) !== nothing
+    @test match(augment(FuzzyQuery(keyword)), Document(document_text)) !== nothing
 end
 
 @testset "Mistake 5: erroneously redacted terms" begin
-    report = with_replacements("xxxs frog" => "Darwins frog") do
-        return Report("""
+    document = with_replacements("xxxs frog" => "Darwins frog") do
+        return Document("""
         A xxxs frog sat on a branch.
         """)
     end
-    @test match(Query("Darwins frog"), report) !== nothing
-    @test match(Query("xxxs frog"), report) === nothing
+    @test match(Query("Darwins frog"), document) !== nothing
+    @test match(Query("xxxs frog"), document) === nothing
 end
 
 @testset "Mistake 6: Search terms that are subsets of other general terms (like acrynoms)" begin
-    @test match(Query(" ant "), Report("This matches ant here")) !== nothing
-    @test match(Query(" ant "), Report("This does not match anteater here")) === nothing
-    @test match(Query("ant"), Report("This does match anteater")) !== nothing
+    @test match(Query(" ant "), Document("This matches ant here")) !== nothing
+    @test match(Query(" ant "), Document("This does not match anteater here")) === nothing
+    @test match(Query("ant"), Document("This does match anteater")) !== nothing
 
-    @test match(word_boundary(Query("ant")), Report("This does match anteater")) === nothing # part of a word is not OK
-    @test match(word_boundary(Query("ant")), Report("This matches ant here")) !== nothing # a separate word is OK
-    @test match(word_boundary(Query("ant")), Report("This matches ant")) !== nothing # end of string is OK
-    @test match(word_boundary(Query("ant")), Report("This matches ant.")) !== nothing # period is OK
-    @test match(word_boundary(Query("ant")), Report("This matches ant?")) !== nothing # other punctuation is OK
+    @test match(word_boundary(Query("ant")), Document("This does match anteater")) === nothing # part of a word is not OK
+    @test match(word_boundary(Query("ant")), Document("This matches ant here")) !== nothing # a separate word is OK
+    @test match(word_boundary(Query("ant")), Document("This matches ant")) !== nothing # end of string is OK
+    @test match(word_boundary(Query("ant")), Document("This matches ant.")) !== nothing # period is OK
+    @test match(word_boundary(Query("ant")), Document("This matches ant?")) !== nothing # other punctuation is OK
 
-    # we count hyphens as a word boundary here (since we remove them from the reports and queries)
-    @test match(word_boundary(Query("ant")), Report("This matches-ant")) !== nothing
+    # we count hyphens as a word boundary here (since we remove them from the documents and queries)
+    @test match(word_boundary(Query("ant")), Document("This matches-ant")) !== nothing
 end
 
 ## A more representative test
@@ -109,24 +109,24 @@ end
             Query("ant's") |
             Query(" ant ")
 
-    # Note that the report has a hyphen and also a mispelling.
-    # We still report a match because we replace hyphens with spaces,
+    # Note that the document has a hyphen and also a mispelling.
+    # We still document a match because we replace hyphens with spaces,
     # and the extra `a` is within the threshold difference.
-    report = Report("""The leaf-cutting aants walked around.""")
-    @test match(query, report) !== nothing
-    @test match(Query("ant's"), Report("The ant's exist")) !== nothing
-    @test match(query, Report("The ant's exist")) !== nothing
-    @test match(Query("ant's"), Report("The aant's exist")) !== nothing
-    @test match(Query(" ant's "), Report("The aant's do not exist")) === nothing
+    document = Document("""The leaf-cutting aants walked around.""")
+    @test match(query, document) !== nothing
+    @test match(Query("ant's"), Document("The ant's exist")) !== nothing
+    @test match(query, Document("The ant's exist")) !== nothing
+    @test match(Query("ant's"), Document("The aant's exist")) !== nothing
+    @test match(Query(" ant's "), Document("The aant's do not exist")) === nothing
 
-    @test match(query, Report("This matches ant here")) !== nothing
-    @test match(query, Report("This does not match anteater")) === nothing
+    @test match(query, Document("This matches ant here")) !== nothing
+    @test match(query, Document("This does not match anteater")) === nothing
 end
 
 ## Functionality tests
 
 # Some public domain text ("The Picture of Dorian Gray" by Oscar Wilde)
-report = Report(lowercase("""
+document = Document(lowercase("""
 The artist is the creator of beautiful things.  To reveal art and
 conceal the artist is art's aim.  The critic is he who can translate
 into another manner or a new material his impression of beautiful
@@ -147,15 +147,15 @@ written, or badly written.  That is all.
 
 @testset "`And` and `Or`" begin
     has_artist = Query("artist")
-    @test match(has_artist, report) !== nothing
+    @test match(has_artist, document) !== nothing
 
     has_abc = Query("abc")
-    @test match(has_abc, report) === nothing
+    @test match(has_abc, document) === nothing
 
-    @test match(has_abc | has_artist, report) !== nothing
+    @test match(has_abc | has_artist, document) !== nothing
     @test length(has_abc | has_artist) == 2
 
-    @test match(has_abc & has_artist, report) === nothing
+    @test match(has_abc & has_artist, document) === nothing
     @test length(has_abc & has_artist) == 2
 
     ands = Query("a") & Query("r") & Query("t") & Query("i")
@@ -163,17 +163,17 @@ written, or badly written.  That is all.
 
     # Test that we collapse instead of nesting
     @test ands isa KeywordSearch.And{NTuple{4,Query}}
-    @test match(ands, report) !== nothing
+    @test match(ands, document) !== nothing
 
     query = (Query("a") | Query("b")) & (Query("c") & Query("d"))
-    @test match(query, report) !== nothing
+    @test match(query, document) !== nothing
     @test query isa
           KeywordSearch.And{Tuple{KeywordSearch.Or{Tuple{Query,Query}},Query,Query}}
     @test length(query) == 4
 
     query = (Query("a") & Query("b")) & (Query("c") | Query("d"))
     @test length(query) == 4
-    @test match(query, report) !== nothing
+    @test match(query, document) !== nothing
     @test query isa
           KeywordSearch.And{Tuple{Query,Query,KeywordSearch.Or{Tuple{Query,Query}}}}
 end
@@ -181,44 +181,44 @@ end
 @testset "`FuzzyQuery`" begin
     # Try some mispelling of "artist"
     fuzzy_has_altist = FuzzyQuery("altist", DamerauLevenshtein(), 1)
-    @test match(fuzzy_has_altist, report) !== nothing
+    @test match(fuzzy_has_altist, document) !== nothing
 
     fuzzy_has_atist = FuzzyQuery("atist", Levenshtein(), 1)
-    @test match(fuzzy_has_atist, report) !== nothing
-    @test match(Query("atist"), report) === nothing
+    @test match(fuzzy_has_atist, document) !== nothing
+    @test match(Query("atist"), document) === nothing
 
-    @test match(FuzzyQuery("atist", Levenshtein(), 0), report) === nothing
+    @test match(FuzzyQuery("atist", Levenshtein(), 0), document) === nothing
 end
 
 @testset "Match objects and `match_all`" begin
-    report = Report("""The crab was eaten by a crb-eating macaque.""")
+    document = Document("""The crab was eaten by a crb-eating macaque.""")
     query = FuzzyQuery("crab-eating macaque")
 
-    m = match(query, report)
+    m = match(query, document)
     @test m.query === query
-    @test m.haystack === report
+    @test m.haystack === document
     @test m.distance == 2
-    @test report.text[m.indices] == " crb eating macaque"
+    @test document.text[m.indices] == " crb eating macaque"
 
-    matches = match_all(query, report)
+    matches = match_all(query, document)
     @test length(matches) == 1
     @test matches[1] == m
 
     query = FuzzyQuery("crab-eating macaque") | FuzzyQuery("crabeating macaque")
-    matches = match_all(query, report)
+    matches = match_all(query, document)
     @test length(matches) == 2
     @test matches[1] == m
 
     @test matches[2].query == FuzzyQuery("crabeating macaque")
-    @test matches[2].haystack === report
+    @test matches[2].haystack === document
     @test matches[2].distance == 2
-    @test report.text[matches[2].indices] == "crb eating macaque"
+    @test document.text[matches[2].indices] == "crb eating macaque"
 end
 
 @testset "`match_all` for `Query`s" begin
-    report = Report("""One crab was eaten.""")
+    document = Document("""One crab was eaten.""")
     query = Query("One") | Query("crab") | Query("eat")
-    matches = match_all(query, report)
+    matches = match_all(query, document)
     @test length(matches) == 3
     @test allunique(matches)
 end
@@ -333,20 +333,20 @@ end
 end
 
 @testset "Printing and `explain`" begin
-    report = Report("Short.")
-    @test occursin("Report with text", sprint(show, report))
+    document = Document("Short.")
+    @test occursin("Document with text", sprint(show, document))
 
-    report = Report("""Two crabs were eaten. This is a longer report
+    document = Document("""Two crabs were eaten. This is a longer document
                         with line breaks and everything. Blah blah blah.""")
-    @test occursin("starting with", sprint(show, report))
-    @test occursin("eaten…", sprint(show, report))
+    @test occursin("starting with", sprint(show, document))
+    @test occursin("eaten…", sprint(show, document))
 
-    patient = Patient([report, report], (;))
-    @test occursin("with 2 reports, each with metadata keys", sprint(show, patient))
-    @test occursin("Patient metadata:", sprint(show, patient))
+    corpus = Corpus([document, document], (;))
+    @test occursin("with 2 documents, each with metadata keys", sprint(show, corpus))
+    @test occursin("Corpus metadata:", sprint(show, corpus))
 
-    # test that long reports without spaces are still truncated
-    @test occursin("…\".", sprint(show, Report(randstring(50))))
+    # test that long documents without spaces are still truncated
+    @test occursin("…\".", sprint(show, Document(randstring(50))))
 
     DL = sprint(show, DamerauLevenshtein())
     @test sprint(show, FuzzyQuery("crab") | Query("eat")) == """
@@ -366,8 +366,8 @@ end
           ├─ Query("eat")
           └─ Query("a")"""
 
-    m = match(FuzzyQuery("crab"), report)
-    answer = "The query \"crab\" matched the text \"Two crabs were eaten  This is a longer report\\nwith…\" with distance 0.\n"
+    m = match(FuzzyQuery("crab"), document)
+    answer = "The query \"crab\" matched the text \"Two crabs were eaten  This is a longer document\\nwith…\" with distance 0.\n"
     @test sprint(explain, m) == answer
     @test @capture_out(explain(m)) == answer
     
@@ -375,9 +375,9 @@ end
         "The query \"crab\" matched the text \"Two crabs were eaten  This is…\" with distance 0.\n"
 
     Q = Query("crab")
-    m = match(Q, report)
+    m = match(Q, document)
     @test sprint(explain, m) ==
-        "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is a longer report\\nwith…\".\n"
+        "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is a longer document\\nwith…\".\n"
     @test sprint((io, x) -> explain(io, x; context=20), m) ==
         "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is…\".\n"
 
@@ -387,7 +387,7 @@ end
         ├─ (query_name = "name",)
         └─ Query("crab")"""
 
-    named_match = match(named_query, report)
+    named_match = match(named_query, document)
     @test sprint(explain, named_match) == sprint(explain, m)
 
     @test sprint(show, named_match) == """
@@ -395,13 +395,13 @@ end
         ├─ (query_name = "name",)
         └─ QueryMatch with distance 0 at indices 5:8.
            ├─ Query("crab")
-           └─ Report starting with "Two crabs were eaten…". Metadata: NamedTuple()"""
+           └─ Document starting with "Two crabs were eaten…". Metadata: NamedTuple()"""
 end
 
-@testset "`Patient` and `NamedMatch`" begin
-    R1 = Report("There were crab eating macqaues!", (; report_uuid=uuid4()))
-    R2 = Report("There were lobster eating macqaues!", (; report_uuid=uuid4()))
-    P1 = Patient([R1, R2], (; patient_uuid=uuid4()))
+@testset "`Corpus` and `NamedMatch`" begin
+    R1 = Document("There were crab eating macqaues!", (; document_uuid=uuid4()))
+    R2 = Document("There were lobster eating macqaues!", (; document_uuid=uuid4()))
+    P1 = Corpus([R1, R2], (; corpus_uuid=uuid4()))
 
     @test match(Query("lobster eating"), P1) !== nothing
     @test match(Query("lobster eating"), P1) == match(Query("lobster eating"), R2)
@@ -410,53 +410,53 @@ end
     @test match_all(Query("eating"), P1) ==
           [match(Query("eating"), R1), match(Query("eating"), R2)]
 
-    R3 = Report("There were king cobras", (; report_uuid=uuid4()))
+    R3 = Document("There were king cobras", (; document_uuid=uuid4()))
     d_uuid = uuid4()
-    R4 = Report("There were other cobras", (; report_uuid=d_uuid))
+    R4 = Document("There were other cobras", (; document_uuid=d_uuid))
     P2_uuid = uuid4()
-    P2 = Patient([R3, R4], (; patient_uuid=P2_uuid))
+    P2 = Corpus([R3, R4], (; corpus_uuid=P2_uuid))
 
     Q = NamedQuery(Query(" other"), "other")
     @test match(Q, P1) === nothing
     res = match(Q, P2)
     @test res isa KeywordSearch.NamedMatch
     @test res.metadata ==
-          (; query_name="other", patient_uuid=P2_uuid, report_uuid=d_uuid)
+          (; query_name="other", corpus_uuid=P2_uuid, document_uuid=d_uuid)
     @test res.match == match(Q.query, R4)
 
     @test match(Q, R4).match == match(Q.query, R4)
-    @test match(Q, R4).metadata == (; query_name="other", report_uuid=d_uuid)
+    @test match(Q, R4).metadata == (; query_name="other", document_uuid=d_uuid)
 
     @testset "Tables interface for `NamedMatch`s" begin
         tbl = [res, res]
         @test Tables.getcolumn(res, 2) == "other"
         @test Tables.isrowtable(tbl)
         @test Tables.columns(tbl).query_name == ["other", "other"]
-        @test Tables.columnnames(res) == (:match, :query_name, :patient_uuid, :report_uuid)
+        @test Tables.columnnames(res) == (:match, :query_name, :corpus_uuid, :document_uuid)
     end
 end
 
 @testset "`AUTOMATIC_REPLACEMENTS`" begin
-    @test with_replacements(() -> Report("abc"), "a" => "b") == with_replacements(() -> Report("bbc"))
+    @test with_replacements(() -> Document("abc"), "a" => "b") == with_replacements(() -> Document("bbc"))
 end
 
 ## Edge cases
 
-@testset "Query vs report lengths" begin
+@testset "Query vs document lengths" begin
     for Q in (FuzzyQuery, Query)
-        # Same query and report length
-        @test match(Query("abc"), Report("def")) === nothing
-        @test match(Query("abc"), Report("abc")) !== nothing
-        @test length(match_all(Query("abc"), Report("abc"))) == 1
-        @test length(match_all(Query("abc"), Report("def"))) == 0
+        # Same query and document length
+        @test match(Query("abc"), Document("def")) === nothing
+        @test match(Query("abc"), Document("abc")) !== nothing
+        @test length(match_all(Query("abc"), Document("abc"))) == 1
+        @test length(match_all(Query("abc"), Document("def"))) == 0
 
         # Zero length query
-        @test length(match_all(Query(""), Report("def"))) == 0
-        @test match(Query(""), Report("def")) === nothing
+        @test length(match_all(Query(""), Document("def"))) == 0
+        @test match(Query(""), Document("def")) === nothing
 
-        # Report length less than query length
-        @test match(Query("abc"), Report("ab")) === nothing
-        @test length(match_all(Query("abc"), Report("ab"))) == 0
+        # Document length less than query length
+        @test match(Query("abc"), Document("ab")) === nothing
+        @test length(match_all(Query("abc"), Document("ab"))) == 0
     end
 end
 
@@ -479,17 +479,17 @@ end
 
 @testset "Errors" begin
     # Cannot use `match` as a metadata key
-    @test_throws ArgumentError Report("abc", (; match=1))
-    @test_throws ArgumentError Patient([Report("abc")], (; match=1))
+    @test_throws ArgumentError Document("abc", (; match=1))
+    @test_throws ArgumentError Corpus([Document("abc")], (; match=1))
     @test_throws ArgumentError NamedQuery(Query("abc"), (; match=1))
 
-    # Cannot have the same metadata keys in a patient and a report it contains
-    @test_throws ErrorException Patient([Report("abc", (; uuid=uuid4()))], (; uuid=uuid4()))
+    # Cannot have the same metadata keys in a corpus and a document it contains
+    @test_throws ErrorException Corpus([Document("abc", (; uuid=uuid4()))], (; uuid=uuid4()))
 
     # Cannot have the same metadata keys in a `NamedQuery` and an object it is matched to
     @test_throws ErrorException match(NamedQuery(Query("a"), (; uuid=uuid4())),
-                                      Report("abc", (; uuid=uuid4())))
+                                      Document("abc", (; uuid=uuid4())))
     @test_throws ErrorException match(NamedQuery(Query("a"), (; uuid=uuid4())),
-                                      Patient([Report("abc", (; uuid=uuid4()))],
-                                              (; patient_name="a")))
+                                      Corpus([Document("abc", (; uuid=uuid4()))],
+                                              (; corpus_name="a")))
 end

@@ -82,15 +82,15 @@ function text_right_endpoint(text::AbstractString, start=1; approx_length=15)
     return R, "…"
 end
 
-function Base.show(io::IO, R::Report)
+function Base.show(io::IO, R::Document)
     n, rdots = text_right_endpoint(R.text)
 
     show_full_text = (length(R.text) < 15) || rdots == ""
     if show_full_text
-        print(io, "Report with text ")
+        print(io, "Document with text ")
         show(io, R.text)
     else
-        print(io, "Report starting with ")
+        print(io, "Document starting with ")
         print(io, "\"", R.text[1:n], rdots, "\"")
     end
     print(io, ". Metadata: ")
@@ -98,13 +98,13 @@ function Base.show(io::IO, R::Report)
     return nothing
 end
 
-function Base.show(io::IO, P::Patient{T,TR}) where {T,TR}
+function Base.show(io::IO, P::Corpus{T,TR}) where {T,TR}
     compact = get(io, :compact, false)
-    print(io, "Patient with ", length(P.reports), " reports, each with metadata keys: ")
+    print(io, "Corpus with ", length(P.documents), " documents, each with metadata keys: ")
     print(io, _nt_names(TR))
 
     if !compact
-        print(io, "\nPatient metadata: ", P.metadata)
+        print(io, "\nCorpus metadata: ", P.metadata)
     end
 end
 
