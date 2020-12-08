@@ -1,4 +1,4 @@
-struct NamedMatch{T,M<:AbstractMatch} <: AbstractMatch
+struct NamedMatch{T,M<:QueryMatch}
     match::M
     metadata::T
     function NamedMatch(match::M, metadata::T) where {M,T}

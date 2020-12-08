@@ -13,12 +13,10 @@ AbstractTrees.children(q::NamedMatch) = (NoChildren(q.metadata), q.match)
 AbstractTrees.children(q::QueryMatch) = (q.query, q.haystack)
 
 AbstractTrees.children(q::Or) = q.subqueries
-AbstractTrees.children(q::And) = q.subqueries
 AbstractTrees.children(q::Query) = tuple()
 AbstractTrees.children(q::FuzzyQuery) = tuple()
 
 AbstractTrees.printnode(io::IO, q::Or) = print(io, "Or")
-AbstractTrees.printnode(io::IO, q::And) = print(io, "And")
 AbstractTrees.printnode(io::IO, q::NamedQuery) = print(io, "NamedQuery")
 AbstractTrees.printnode(io::IO, q::NamedMatch) = print(io, "NamedMatch")
 
@@ -36,7 +34,7 @@ function print_tree_rstrip(io::IO, x)
     return nothing
 end
 
-Base.show(io::IO, q::Union{And,Or,NamedQuery,NamedMatch}) = print_tree_rstrip(io, q)
+Base.show(io::IO, q::Union{Or,NamedQuery,NamedMatch}) = print_tree_rstrip(io, q)
 
 # `text_left_endpoint` and `text_right_endpoint` could be combined
 # but it would probably be too clever... let's just duplicate it
@@ -145,7 +143,7 @@ function explain(io::IO, m::QueryMatch{Query}; context=40)
     return nothing
 end
 
-explain(m::AbstractMatch; context=40) = explain(stdout, m; context=context)
+explain(m; context=40) = explain(stdout, m; context=context)
 
 function Base.show(io::IO, m::QueryMatch)
     return print(io, "QueryMatch with distance ", m.distance, " at indices ", m.indices, ".")
