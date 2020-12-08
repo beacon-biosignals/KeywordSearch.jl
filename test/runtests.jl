@@ -145,7 +145,7 @@ written, or badly written.  That is all.
 
 """))
 
-@testset "`And` and `Or`" begin
+@testset "`Or`" begin
     has_artist = Query("artist")
     @test match(has_artist, document) !== nothing
 
@@ -155,27 +155,12 @@ written, or badly written.  That is all.
     @test match(has_abc | has_artist, document) !== nothing
     @test length(has_abc | has_artist) == 2
 
-    @test match(has_abc & has_artist, document) === nothing
-    @test length(has_abc & has_artist) == 2
-
-    ands = Query("a") & Query("r") & Query("t") & Query("i")
-    @test length(ands) == 4
-
-    # Test that we collapse instead of nesting
-    @test ands isa KeywordSearch.And{NTuple{4,Query}}
-    @test match(ands, document) !== nothing
-
-    query = (Query("a") | Query("b")) & (Query("c") & Query("d"))
+    # test nesting
+    query = (Query("a") | Query("b")) | (Query("c") | Query("d"))
     @test match(query, document) !== nothing
     @test query isa
-          KeywordSearch.And{Tuple{KeywordSearch.Or{Tuple{Query,Query}},Query,Query}}
+          KeywordSearch.Or{Tuple{Query,Query,Query,Query}}
     @test length(query) == 4
-
-    query = (Query("a") & Query("b")) & (Query("c") | Query("d"))
-    @test length(query) == 4
-    @test match(query, document) !== nothing
-    @test query isa
-          KeywordSearch.And{Tuple{Query,Query,KeywordSearch.Or{Tuple{Query,Query}}}}
 end
 
 @testset "`FuzzyQuery`" begin
@@ -353,18 +338,6 @@ end
         Or
         ├─ FuzzyQuery("crab", $DL, 2)
         └─ Query("eat")"""
-
-    @test sprint(show, FuzzyQuery("crab") & Query("eat")) == """
-        And
-        ├─ FuzzyQuery("crab", $DL, 2)
-        └─ Query("eat")"""
-
-    @test sprint(show, FuzzyQuery("crab") & (Query("eat") | Query("a"))) == """
-       And
-       ├─ FuzzyQuery("crab", $DL, 2)
-       └─ Or
-          ├─ Query("eat")
-          └─ Query("a")"""
 
     m = match(FuzzyQuery("crab"), document)
     answer = "The query \"crab\" matched the text \"Two crabs were eaten  This is a longer document\\nwith…\" with distance 0.\n"

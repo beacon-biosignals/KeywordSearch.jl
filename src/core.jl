@@ -96,29 +96,7 @@ end
 
 Or(q1::AbstractQuery, q2::AbstractQuery) = Or((q1, q2))
 
-struct And{S<:Tuple} <: AbstractQuery
-    subqueries::S
-end
-
-# This is type-unstable...
-function Base.match(Q::And, R::Document)
-    matches = tuple()
-    for subquery in Q.subqueries
-        m = match(subquery, R)
-        m === nothing && return nothing
-        matches = (matches..., m)
-    end
-    return AndMatch(matches)
-end
-
-# Specializations to combine And's
-And(q1::And, q2::AbstractQuery) = And((q1.subqueries..., q2))
-And(q1::AbstractQuery, q2::And) = And((q1, q2.subqueries...))
-And(q1::And, q2::And) = And((q1.subqueries..., q2.subqueries...))
-And(q1::AbstractQuery, q2::AbstractQuery) = And((q1, q2))
-
 Base.:(|)(q1::AbstractQuery, q2::AbstractQuery) = Or(q1, q2)
-Base.:(&)(q1::AbstractQuery, q2::AbstractQuery) = And(q1, q2)
 
 struct FuzzyQuery{D,T} <: AbstractQuery
     text::String
