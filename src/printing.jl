@@ -125,6 +125,38 @@ function printcontext(io::IO, m::QueryMatch; context=40)
     return nothing
 end
 
+"""
+    explain([io=stdout], match; context=40)
+
+Prints a human-readable explanation of the match
+and its context in the document in which it was found.
+
+## Example
+
+```julia
+julia> using KeywordSearch
+
+julia> document = Document("The crabeating macacue ate a crab.")
+Document starting with "The crabeating macacue…". Metadata: NamedTuple()
+
+julia> query = augment(FuzzyQuery("crab-eating macaque"))
+Or
+├─ FuzzyQuery("crab eating macaque", DamerauLevenshtein{Nothing}(nothing), 2)
+├─ FuzzyQuery("crabeating macaque", DamerauLevenshtein{Nothing}(nothing), 2)
+├─ FuzzyQuery("crab eatingmacaque", DamerauLevenshtein{Nothing}(nothing), 2)
+└─ FuzzyQuery("crabeatingmacaque", DamerauLevenshtein{Nothing}(nothing), 2)
+
+julia> m = match(query, document)
+QueryMatch with distance 1 at indices 
+5:22.
+
+julia> explain(m)
+The query "crabeating macaque" matched the text "The crabeating macacue ate a crab  " with distance 1.
+
+```
+"""
+explain
+
 function explain(io::IO, m::QueryMatch{<:FuzzyQuery}; context=40)
     print(io, "The query ")
     show(io, m.query.text)

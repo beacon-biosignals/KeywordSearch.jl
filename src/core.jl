@@ -75,6 +75,23 @@ struct Query <: AbstractQuery
     Query(str::AbstractString) = new(process_punct(str))
 end
 
+
+"""
+    Base.match(query::AbstractQuery, text::Union{Document,Corpus})
+
+Looks for a match for `query` in the text. Returns either `nothing`
+if no match is found, or a [`QueryMatch`](@ref) object.
+"""
+Base.match(query::AbstractQuery, text::Union{Document,Corpus})
+
+"""
+    match_all(query::AbstractQuery, text::Union{Document,Corpus})
+
+Looks for all matches for `query` in the text. Returns either a
+`Vector` `QueryMatch` objects corresponding to all of the matches found.
+"""
+match_all(query::AbstractQuery, text::Union{Document,Corpus})
+
 function Base.match(Q::Query, R::Document)
     if (length(R.text) < length(Q.text)) || (length(Q.text) == 0)
         return nothing

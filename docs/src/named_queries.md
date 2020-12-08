@@ -1,4 +1,6 @@
-# Named queries
+# Tables of matches
+
+via [`NamedQuery`](@ref)s.
 
 ```@repl 2
 using KeywordSearch, Random, DataFrames

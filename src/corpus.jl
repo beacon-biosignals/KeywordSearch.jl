@@ -20,6 +20,7 @@ struct Corpus{T<:NamedTuple,D}
     end
 end
 
+
 function Base.match(query::AbstractQuery, p::Corpus)
     for r in p.documents
         m = match(query, r)
