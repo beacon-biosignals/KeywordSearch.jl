@@ -1,3 +1,16 @@
+"""
+    Report{T<:NamedTuple}
+
+Represents a single report or document. This object has two fields,
+
+* `text::String`
+* `metadata::T`
+
+The `text` is automatically processed by first applying the replacements
+from [`AUTOMATIC_REPLACEMENTS`](@ref), then replacing punctuation
+matching `r"[.!?><\\-]"` by spaces, and  finally by
+adding a space to the end of the document.
+"""
 struct Report{T<:NamedTuple}
     text::String
     metadata::T

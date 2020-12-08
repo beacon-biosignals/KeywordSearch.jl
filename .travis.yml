@@ -3,13 +3,22 @@ language: julia
 os:
   - linux
 dist: xenial
-if: branch = master OR tag IS present OR type = pull_request
 julia:
   - 1
+  - 1.5
+if: branch = main OR tag IS present OR type = pull_request
 notifications:
   email: false
-before_script:
-  - git config --global url.git@github.com:.insteadOf https://github.com/
-  - julia --color=yes --project= -e 'using Pkg; Pkg.update()'  # Install General
-  - git clone git@github.com:beacon-biosignals/BeaconRegistry.git ~/.julia/registries/Beacon
-codecov: true
+after_success:
+  # push coverage results to Coveralls
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.5
+      os: linux
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()));
+                                               Pkg.instantiate()'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip

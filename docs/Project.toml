@@ -1,0 +1,6 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+KeywordSearch = "f977ba8c-7144-47e8-b06b-e3f658952959"
+
+[compat]
+Documenter = "0.25"

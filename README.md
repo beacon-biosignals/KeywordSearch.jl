@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/beacon-biosignals/KeywordSearch.jl.svg?token=qU8T6PeEpvsZqJyAfq2z&branch=master)](https://travis-ci.com/beacon-biosignals/KeywordSearch.jl)
-[![codecov](https://codecov.io/gh/beacon-biosignals/KeywordSearch.jl/branch/master/graph/badge.svg?token=0HRHZ1BL60)](https://app.codecov.io/gh/beacon-biosignals/KeywordSearch.jl)
+[![Build Status](https://travis-ci.com/beacon-biosignals/KeywordSearch.jl.svg?branch=main)](https://travis-ci.com/beacon-biosignals/KeywordSearch.jl)
+[![codecov](https://codecov.io/gh/beacon-biosignals/KeywordSearch.jl/branch/main/badge.svg)](https://app.codecov.io/gh/beacon-biosignals/KeywordSearch.jl)
 
 # KeywordSearch
 
@@ -58,3 +58,5 @@ julia> explain(m)
 The query "crabeating macaque" matched the text "The crabeating macacue ate a crab \n " with distance 1.
 
 ```
+
+Currently, only the `StringDistances.DamerauLevenshtein` distance measure is supported.
