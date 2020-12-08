@@ -36,11 +36,11 @@ end
 
 NamedQuery(query::AbstractQuery, name::AbstractString) = NamedQuery(query, (; query_name=name))
 
-# Here, it seems like we could just dispach on `obj::Union{Patient, Report}`.
-# However, that leads to an ambiguity with `match(query::KeywordSearch.AbstractQuery, p::Patient)`
-# in `src/patient.jl`. We solve that by creating a separate methods for `Report`s and `Patient`s
+# Here, it seems like we could just dispach on `obj::Union{Corpus, Document}`.
+# However, that leads to an ambiguity with `match(query::KeywordSearch.AbstractQuery, p::Corpus)`
+# in `src/corpus.jl`. We solve that by creating a separate methods for `Document`s and `Corpus`s
 # here.
-for OT in (:Patient, :Report)
+for OT in (:Corpus, :Document)
     @eval function Base.match(Q::NamedQuery, obj::$(OT))
         disjoint_keys_check(Q, obj)
         m = match(Q.query, obj)
@@ -60,30 +60,30 @@ object which was matched.
 ## Example
 
 ```julia
-julia> report_1 = Report("One", (; report_name = "a"))
-Report with text "One ". Metadata: (report_name = "a",)
+julia> document_1 = Document("One", (; document_name = "a"))
+Document with text "One ". Metadata: (document_name = "a",)
 
-julia> report_2 = Report("Two", (; report_name = "b"))
-Report with text "Two ". Metadata: (report_name = "b",)
+julia> document_2 = Document("Two", (; document_name = "b"))
+Document with text "Two ". Metadata: (document_name = "b",)
 
-julia> patient = Patient([report_1, report_2], (; patient_name = "Numbers"))
-Patient with 2 reports, each with metadata keys: (:report_name,)
-Patient metadata: (patient_name = "Numbers",)
+julia> corpus = Corpus([document_1, document_2], (; corpus_name = "Numbers"))
+Corpus with 2 documents, each with metadata keys: (:document_name,)
+Corpus metadata: (corpus_name = "Numbers",)
 
 julia> query = NamedQuery(FuzzyQuery("one"), "find one")
 NamedQuery
 ├─ (query_name = "find one",)
 └─ FuzzyQuery("one", DamerauLevenshtein(), 2)
 
-julia> m = match(query, patient)
+julia> m = match(query, corpus)
 NamedMatch
-├─ (query_name = "find one", patient_name = "Numbers", report_name = "a")
+├─ (query_name = "find one", corpus_name = "Numbers", document_name = "a")
 └─ QueryMatch with distance 1 at indices 1:3.
    ├─ FuzzyQuery("one", DamerauLevenshtein(), 2)
-   └─ Report with text "One ". Metadata: (report_name = "a",)
+   └─ Document with text "One ". Metadata: (document_name = "a",)
 
 julia> m.metadata
-(query_name = "find one", patient_name = "Numbers", report_name = "a")
+(query_name = "find one", corpus_name = "Numbers", document_name = "a")
 ```
 """
 NamedQuery

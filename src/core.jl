@@ -1,7 +1,7 @@
 """
-    Report{T<:NamedTuple}
+    Document{T<:NamedTuple}
 
-Represents a single report or document. This object has two fields,
+Represents a single string document. This object has two fields,
 
 * `text::String`
 * `metadata::T`
@@ -11,19 +11,19 @@ from [`AUTOMATIC_REPLACEMENTS`](@ref), then replacing punctuation
 matching `r"[.!?><\\-]"` by spaces, and  finally by
 adding a space to the end of the document.
 """
-struct Report{T<:NamedTuple}
+struct Document{T<:NamedTuple}
     text::String
     metadata::T
 
-    function Report(text::AbstractString, metadata::T) where {T}
+    function Document(text::AbstractString, metadata::T) where {T}
         check_keys(T)
-        return new{T}(process_report(text), metadata)
+        return new{T}(process_document(text), metadata)
     end
 end
 
-Report(text::AbstractString) = Report(text, NamedTuple())
+Document(text::AbstractString) = Document(text, NamedTuple())
 
-function process_report(str::AbstractString)
+function process_document(str::AbstractString)
     # Apply automatic replacements
     # using https://github.com/JuliaLang/julia/issues/29849#issuecomment-449535743
     str = foldl(replace, AUTOMATIC_REPLACEMENTS, init=str)
@@ -46,7 +46,7 @@ struct Query <: AbstractQuery
     Query(str::AbstractString) = new(process_punct(str))
 end
 
-function Base.match(Q::Query, R::Report)
+function Base.match(Q::Query, R::Document)
     if (length(R.text) < length(Q.text)) || (length(Q.text) == 0)
         return nothing
     end
@@ -55,7 +55,7 @@ function Base.match(Q::Query, R::Report)
     return QueryMatch(Q, R, 0, inds)
 end
 
-function match_all(Q::Query, R::Report)
+function match_all(Q::Query, R::Document)
     if (length(R.text) < length(Q.text)) || (length(Q.text) == 0)
         all_inds = UnitRange[]
     else
@@ -71,7 +71,7 @@ struct Or{S<:Tuple} <: AbstractQuery
     subqueries::S
 end
 
-function Base.match(Q::Or, R::Report)
+function Base.match(Q::Or, R::Document)
     for subquery in Q.subqueries
         m = match(subquery, R)
         m !== nothing && return m
@@ -79,7 +79,7 @@ function Base.match(Q::Or, R::Report)
     return nothing
 end
 
-function match_all(Q::Or, R::Report)
+function match_all(Q::Or, R::Document)
     return reduce(vcat, (match_all(subquery, R) for subquery in Q.subqueries))
 end
 
@@ -101,7 +101,7 @@ struct And{S<:Tuple} <: AbstractQuery
 end
 
 # This is type-unstable...
-function Base.match(Q::And, R::Report)
+function Base.match(Q::And, R::Document)
     matches = tuple()
     for subquery in Q.subqueries
         m = match(subquery, R)
@@ -168,8 +168,8 @@ function _findmin(s1, s2, dist::Partial; max_dist)
     return out, nextind(s2, 0, out_idx):nextind(s2, 0, out_idx + len1 - 1)
 end
 
-function Base.match(Q::FuzzyQuery, R::Report)
-    # We assume the report text is longer than the query text
+function Base.match(Q::FuzzyQuery, R::Document)
+    # We assume the document text is longer than the query text
     length(R.text) < length(Q.text) && return nothing
 
     dist, inds = _findmin(Q.text, R.text, Partial(Q.dist); max_dist=Q.threshold)
@@ -244,7 +244,7 @@ function non_overlapping_matches(matches)
     return non_overlapping_matches
 end
 
-function match_all(Q::FuzzyQuery, R::Report)
+function match_all(Q::FuzzyQuery, R::Document)
     matches = _findall(Q.text, R.text, Partial(Q.dist); max_dist=Q.threshold)
     matches_no_overlap = non_overlapping_matches(matches)
     return [QueryMatch(Q, R, m...) for m in matches_no_overlap]

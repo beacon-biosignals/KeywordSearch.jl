@@ -29,7 +29,7 @@ We also will pay attention to one source of false positives:
 We address...
 
 * ...(1) by using fuzzy matching via an edit distance (i.e. a string matches another substring if it is the same up to `n` edits, where we have to choose `n`). Edit distances are supplied by [StringDistances.jl](https://github.com/matthieugomez/StringDistances.jl).
-* ...(2) by not requiring matches between word boundaries but just between substrings (i.e. if the query is `cobra` and `kingcobra` shows up in the report, then we would have a perfect match with the substring `cobra` found in the report)
+* ...(2) by not requiring matches between word boundaries but just between substrings (i.e. if the query is `cobra` and `kingcobra` shows up in the document, then we would have a perfect match with the substring `cobra` found in the document)
 * ...(3) and (4) by first replacing hyphens with spaces, and then augmenting our search terms by taking any terms with spaces or hyphens and generating a list of terms with each possible choice of (spaces, no spaces). For example, the query "crab-eating macaque" is augmented to the query ("crab eating macaque" OR "crabeating macaque" OR "crab eatingmacaque" OR "crabeatingmacaque").
 * ...(5) Here, we allow a global list of replacements (`KeywordSearch.AUTOMATIC_REPLACEMENTS`) to manually undo erroneous redaction.
 * ...(6) Here, our solution to (2) has gotten us into trouble. What we can do is add spaces to our term, e.g., instead of searching for "ant" we can search for " ant " and require an exact match. This is accomplished by e.g. `word_boundary(Query("ant"))` in the language of KeywordSearch.jl.
@@ -39,10 +39,10 @@ We address...
 ```julia
 julia> using KeywordSearch, UUIDs
 
-julia> document = Report("""
+julia> document = Document("""
                          The crabeating macacue ate a crab.
                          """, (; document_uuid = uuid4()))
-Report starting with "The crabeating macacue…". Metadata: (document_uuid = UUID("a703302c-eeda-46ba-8755-940a7db86b63"),)
+Document starting with "The crabeating macacue…". Metadata: (document_uuid = UUID("a703302c-eeda-46ba-8755-940a7db86b63"),)
 
 julia> query = augment(FuzzyQuery("crab-eating macaque"))
 Or
