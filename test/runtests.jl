@@ -399,33 +399,33 @@ end
 end
 
 @testset "`Corpus` and `NamedMatch`" begin
-    R1 = Document("There were crab eating macqaues!", (; document_uuid=uuid4()))
-    R2 = Document("There were lobster eating macqaues!", (; document_uuid=uuid4()))
-    P1 = Corpus([R1, R2], (; corpus_uuid=uuid4()))
+    D1 = Document("There were crab eating macqaues!", (; document_uuid=uuid4()))
+    D2 = Document("There were lobster eating macqaues!", (; document_uuid=uuid4()))
+    C1 = Corpus([D1, D2], (; corpus_uuid=uuid4()))
 
-    @test match(Query("lobster eating"), P1) !== nothing
-    @test match(Query("lobster eating"), P1) == match(Query("lobster eating"), R2)
-    @test match(Query("crab eating"), P1) !== nothing
-    @test match(Query("crab eating"), P1) == match(Query("crab eating"), R1)
-    @test match_all(Query("eating"), P1) ==
-          [match(Query("eating"), R1), match(Query("eating"), R2)]
+    @test match(Query("lobster eating"), C1) !== nothing
+    @test match(Query("lobster eating"), C1) == match(Query("lobster eating"), D2)
+    @test match(Query("crab eating"), C1) !== nothing
+    @test match(Query("crab eating"), C1) == match(Query("crab eating"), D1)
+    @test match_all(Query("eating"), C1) ==
+          [match(Query("eating"), D1), match(Query("eating"), D2)]
 
-    R3 = Document("There were king cobras", (; document_uuid=uuid4()))
+    D3 = Document("There were king cobras", (; document_uuid=uuid4()))
     d_uuid = uuid4()
-    R4 = Document("There were other cobras", (; document_uuid=d_uuid))
-    P2_uuid = uuid4()
-    P2 = Corpus([R3, R4], (; corpus_uuid=P2_uuid))
+    D4 = Document("There were other cobras", (; document_uuid=d_uuid))
+    C2_uuid = uuid4()
+    C2 = Corpus([D3, D4], (; corpus_uuid=C2_uuid))
 
     Q = NamedQuery(Query(" other"), "other")
-    @test match(Q, P1) === nothing
-    res = match(Q, P2)
+    @test match(Q, C1) === nothing
+    res = match(Q, C2)
     @test res isa KeywordSearch.NamedMatch
     @test res.metadata ==
-          (; query_name="other", corpus_uuid=P2_uuid, document_uuid=d_uuid)
-    @test res.match == match(Q.query, R4)
+          (; query_name="other", corpus_uuid=C2_uuid, document_uuid=d_uuid)
+    @test res.match == match(Q.query, D4)
 
-    @test match(Q, R4).match == match(Q.query, R4)
-    @test match(Q, R4).metadata == (; query_name="other", document_uuid=d_uuid)
+    @test match(Q, D4).match == match(Q.query, D4)
+    @test match(Q, D4).metadata == (; query_name="other", document_uuid=d_uuid)
 
     @testset "Tables interface for `NamedMatch`s" begin
         tbl = [res, res]
