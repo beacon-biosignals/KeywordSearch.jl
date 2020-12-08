@@ -60,7 +60,9 @@ struct NamedQuery{T<:NamedTuple,Q<:AbstractQuery} <: AbstractQuery
     end
 end
 
-NamedQuery(query::AbstractQuery, name::AbstractString) = NamedQuery(query, (; query_name=name))
+function NamedQuery(query::AbstractQuery, name::AbstractString)
+    return NamedQuery(query, (; query_name=name))
+end
 
 # Here, it seems like we could just dispach on `obj::Union{Corpus, Document}`.
 # However, that leads to an ambiguity with `match(query::KeywordSearch.AbstractQuery, p::Corpus)`

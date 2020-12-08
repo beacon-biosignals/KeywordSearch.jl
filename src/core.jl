@@ -26,7 +26,7 @@ Document(text::AbstractString) = Document(text, NamedTuple())
 function process_document(str::AbstractString)
     # Apply automatic replacements
     # using https://github.com/JuliaLang/julia/issues/29849#issuecomment-449535743
-    str = foldl(replace, AUTOMATIC_REPLACEMENTS, init=str)
+    str = foldl(replace, AUTOMATIC_REPLACEMENTS; init=str)
     # Replace punctuation with a space
     str = process_punct(str)
     # Add a final space to ensure that the last word is recognized
@@ -151,7 +151,6 @@ end
 
 FuzzyQuery(str::String) = FuzzyQuery(str, DamerauLevenshtein(), 2)
 
-
 function dist_with_threshold(dist::DamerauLevenshtein, str1, str2, max_dist)
     return DamerauLevenshtein(max_dist)(str1, str2)
 end
@@ -175,7 +174,8 @@ returns the first set of indices at which an optimal partial match was found.
 function _findmin(s1, s2, dist::Partial; max_dist)
     s1, s2 = StringDistances.reorder(s1, s2)
     len1, len2 = length(s1), length(s2)
-    len1 == len2 && return dist_with_threshold(dist.dist, s1, s2, max_dist), firstindex(s2):lastindex(s2)
+    len1 == len2 && return dist_with_threshold(dist.dist, s1, s2, max_dist),
+           firstindex(s2):lastindex(s2)
     out = max_dist + 1
     len1 == 0 && return out, 1:0
     out_idx = 0

@@ -14,7 +14,7 @@ A list of replacements to automatically perform when preprocessing a [`Document`
 For example, if `KeywordSearch.AUTOMATIC_REPLACEMENTS == ["a" => "b"]`, then
 `Document("abc").text == "bbc"` instead of "abc".
 """
-const AUTOMATIC_REPLACEMENTS = Pair{String, String}[]
+const AUTOMATIC_REPLACEMENTS = Pair{String,String}[]
 
 include("core.jl")
 include("corpus.jl")

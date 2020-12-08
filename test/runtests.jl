@@ -344,16 +344,16 @@ end
     answer = "The query \"crab\" matched the text \"Two crabs were eaten  This is a longer document\\nwith…\" with distance 0.\n"
     @test sprint(explain, m) == answer
     @test @capture_out(explain(m)) == answer
-    
+
     @test sprint((io, x) -> explain(io, x; context=20), m) ==
-        "The query \"crab\" matched the text \"Two crabs were eaten  This is…\" with distance 0.\n"
+          "The query \"crab\" matched the text \"Two crabs were eaten  This is…\" with distance 0.\n"
 
     Q = Query("crab")
     m = match(Q, document)
     @test sprint(explain, m) ==
         "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is a longer document\\nwith…\".\n"
     @test sprint((io, x) -> explain(io, x; context=20), m) ==
-        "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is…\".\n"
+          "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is…\".\n"
 
     named_query = NamedQuery(Q, "name")
     @test sprint(show, named_query) == """
@@ -448,13 +448,12 @@ end
     @test KeywordSearch.text_right_endpoint(str, 5; approx_length=20) == (20, "")
     @test KeywordSearch.text_right_endpoint(str, 5; approx_length=10) == (15, "…")
 
-    str_space = str[1:4] * " " * str[5:end-1]
+    str_space = str[1:4] * " " * str[5:(end - 1)]
     @test KeywordSearch.text_left_endpoint(str_space, 15; approx_length=5) == (6, "…")
     @test KeywordSearch.text_left_endpoint(str_space, 15; approx_length=4) == (11, "…")
 
     @test KeywordSearch.text_right_endpoint(str_space, 1; approx_length=3) == (4, "…")
     @test KeywordSearch.text_right_endpoint(str_space, 1; approx_length=1) == (2, "…")
-
 end
 
 @testset "Errors" begin
