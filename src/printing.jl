@@ -143,6 +143,13 @@ function explain(io::IO, m::QueryMatch{Query}; context=40)
     return nothing
 end
 
+# in case we no longer have a `QueryMatch` but at least have a row-like
+# object with the right fields.
+function explain(io::IO, row; context=40)
+    match = QueryMatch(row.query, row.haystack, row.distance, row.indices)
+    return explain(io, match; context=context)
+end
+
 explain(m; context=40) = explain(stdout, m; context=context)
 
 function Base.show(io::IO, m::QueryMatch)

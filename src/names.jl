@@ -7,9 +7,35 @@ struct NamedMatch{T,M<:QueryMatch}
     end
 end
 
-Tables.getcolumn(m::NamedMatch, i::Int) = i == 1 ? m.match : m.metadata[i - 1]
-Tables.getcolumn(m::NamedMatch, s::Symbol) = s === :match ? m.match : m.metadata[s]
-Tables.columnnames(m::NamedMatch) = (:match, keys(m.metadata)...)
+function Tables.getcolumn(m::NamedMatch, i::Int)
+    if i === 1
+        return m.match.query
+    elseif i === 2
+        return m.match.haystack
+    elseif i === 3
+        return m.match.distance
+    elseif i === 4
+        return m.match.indices
+    else
+        return m.metadata[i - 4]
+    end
+end
+
+function Tables.getcolumn(m::NamedMatch, s::Symbol)
+    if s === :query
+        return m.match.query
+    elseif s === :haystack
+        return m.match.haystack
+    elseif s === :distance
+        return m.match.distance
+    elseif s === :indices
+        return m.match.indices
+    else
+        return m.metadata[s]
+    end
+end
+
+Tables.columnnames(m::NamedMatch) = (:haystack, :distance, :indices, :query, keys(m.metadata)...)
 Tables.isrowtable(::Type{<:AbstractVector{<:NamedMatch}}) = true
 
 explain(io::IO, m::NamedMatch; context=40) = explain(io, m.match; context=context)
