@@ -401,8 +401,13 @@ end
     @test match(Q, D4).metadata == (; query_name="other", document_uuid=d_uuid)
 
     @testset "Tables interface for `NamedMatch`s" begin
+        @test Tables.getcolumn(res, 1) == Tables.getcolumn(res, :query) == Q.query
+        @test Tables.getcolumn(res, 2) == Tables.getcolumn(res, :haystack) == D4
+        @test Tables.getcolumn(res, 3) == Tables.getcolumn(res, :distance) == 0
+        @test Tables.getcolumn(res, 4) == Tables.getcolumn(res, :indices)
+        @test Tables.getcolumn(res, 5) == Tables.getcolumn(res, :query_name) == "other"
+        @test Tables.getcolumn(res, 6) == Tables.getcolumn(res, :corpus_uuid) == C2_uuid
         tbl = [res, res]
-        @test Tables.getcolumn(res, 5) == "other"
         @test Tables.isrowtable(tbl)
         @test Tables.columns(tbl).query_name == ["other", "other"]
         @test Tables.columnnames(res) == (:haystack, :distance, :indices, :query, :query_name, :corpus_uuid, :document_uuid)
