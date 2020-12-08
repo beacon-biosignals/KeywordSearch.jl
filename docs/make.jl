@@ -4,7 +4,10 @@ using Documenter
 makedocs(modules=[KeywordSearch],
          sitename="KeywordSearch",
          authors="Beacon Biosignals and other contributors",
-         pages=["API Documentation" => "index.md"],
+         pages=["Home" => "index.md",
+                "Quick tutorial" => "tutorial.md",
+                "Tables of queries" => "named_queries.md",
+                "API Documentation" => "api_documentation.md"],
          )
 
        
