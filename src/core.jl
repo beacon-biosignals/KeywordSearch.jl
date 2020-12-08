@@ -39,6 +39,17 @@ function process_punct(str::AbstractString)
     return replace(str, r"[.!?><\\-]" => " ")
 end
 
+"""
+    QueryMatch{Q,H,D,I}
+
+Represents a match for an `AbstractQuery`, with four fields:
+
+* `query::Q`: the query itself
+* `haystack::H`: the [`Document`](@ref) which was matched to
+* `distance::D`: the distance of the match
+* `indices::I`: the indices of where in the `haystack` the match occurred.
+
+"""
 struct QueryMatch{Q,H,D,I}
     query::Q
     haystack::H
@@ -48,6 +59,17 @@ end
 
 abstract type AbstractQuery end
 
+"""
+    Query <: AbstractQuery
+
+A query to search for an exact match of a string,
+with one field:
+
+* `text::String`
+
+The text is preprocessed by removing punctuation in
+the same way as for [`Document`](@ref)s.
+"""
 struct Query <: AbstractQuery
     text::String
     Query(str::AbstractString) = new(process_punct(str))
@@ -105,6 +127,19 @@ Or(q1::AbstractQuery, q2::AbstractQuery) = Or((q1, q2))
 
 Base.:(|)(q1::AbstractQuery, q2::AbstractQuery) = Or(q1, q2)
 
+"""
+    FuzzyQuery{D,T} <: AbstractQuery
+
+A query to search for an fuzzy match of a string,
+with three fields:
+
+* `text::String`: the text to match
+* `dist::D`: the distance measure to use; defaults to `DamerauLevenshtein()`
+* `threshold::T`: the maximum threshold allowed for a match; defaults to 2.
+
+The text is preprocessed by removing punctuation in
+the same way as for [`Document`](@ref)s.
+"""
 struct FuzzyQuery{D,T} <: AbstractQuery
     text::String
     dist::D
