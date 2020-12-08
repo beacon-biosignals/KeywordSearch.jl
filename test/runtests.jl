@@ -327,7 +327,7 @@ end
     @test occursin("starting with", sprint(show, document))
     @test occursin("eaten…", sprint(show, document))
 
-    corpus = Corpus([document, document], (;))
+    corpus = Corpus([document, document], NamedTuple())
     @test occursin("with 2 documents, each with metadata keys", sprint(show, corpus))
     @test occursin("Corpus metadata:", sprint(show, corpus))
 
