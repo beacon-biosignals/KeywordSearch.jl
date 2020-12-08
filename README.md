@@ -1,5 +1,7 @@
 [![Build Status](https://github.com/beacon-biosignals/KeywordSearch.jl/workflows/CI/badge.svg?branch=main)](https://github.com/beacon-biosignals/KeywordSearch.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/beacon-biosignals/KeywordSearch.jl/branch/main/graph/badge.svg?token=0HRHZ1BL60)](https://codecov.io/gh/beacon-biosignals/KeywordSearch.jl)
+[![Docs: stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://beacon-biosignals.github.io/KeywordSearch.jl/stable)
+[![Docs: development](https://img.shields.io/badge/docs-dev-blue.svg)](https://beacon-biosignals.github.io/KeywordSearch.jl/dev)
 
 # KeywordSearch
 
