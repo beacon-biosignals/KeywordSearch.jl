@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/beacon-biosignals/KeywordSearch.jl.svg?branch=main)](https://travis-ci.com/beacon-biosignals/KeywordSearch.jl)
+[![Build Status](https://github.com/beacon-biosignals/KeywordSearch.jl/workflows/CI/badge.svg)](https://github.com/beacon-biosignals/KeywordSearch.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/beacon-biosignals/KeywordSearch.jl/branch/main/badge.svg)](https://app.codecov.io/gh/beacon-biosignals/KeywordSearch.jl)
 
 # KeywordSearch
