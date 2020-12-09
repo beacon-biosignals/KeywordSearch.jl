@@ -28,7 +28,6 @@ end
 
 Document(text::AbstractString) = Document(text, NamedTuple())
 
-
 function apply_replacements(str::AbstractString)
     # Apply automatic replacements
     # using https://github.com/JuliaLang/julia/issues/29849#issuecomment-449535743
