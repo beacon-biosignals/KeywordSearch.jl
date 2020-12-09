@@ -222,7 +222,7 @@ julia> explain(m; context=5) # tweak the amount of context printed
 The query "crabeating macaque" matched the text "The crabeating macacue ate…" with distance 1.
 
 julia> sprint(explain, m) # to get the explanation as a string
-"The query \"crabeating macaque\" matched the text \"The crabeating macacue ate a crab  \" with distance 1.\n"
+"The query \\"crabeating macaque\\" matched the text \\"The crabeating macacue ate a crab  \\" with distance 1.\n"
 
 julia> explain(match(Query("crab"), document)) # exact queries print slightly differently
 The query "crab" exactly matched the text "The crabeating macacue ate a crab  ".
