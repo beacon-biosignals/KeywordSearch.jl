@@ -185,7 +185,7 @@ end
 
     m = match(query, document)
     @test m.query === query
-    @test m.haystack === document
+    @test m.document === document
     @test m.distance == 2
     @test document.text[m.indices] == " crb eating macaque"
 
@@ -199,7 +199,7 @@ end
     @test matches[1] == m
 
     @test matches[2].query == FuzzyQuery("crabeating macaque")
-    @test matches[2].haystack === document
+    @test matches[2].document === document
     @test matches[2].distance == 2
     @test document.text[matches[2].indices] == "crb eating macaque"
 end
@@ -367,7 +367,7 @@ end
 
     @testset "Tables interface for `NamedMatch`s" begin
         @test Tables.getcolumn(res, 1) == Tables.getcolumn(res, :query) == Q.query
-        @test Tables.getcolumn(res, 2) == Tables.getcolumn(res, :haystack) == D4
+        @test Tables.getcolumn(res, 2) == Tables.getcolumn(res, :document) == D4
         @test Tables.getcolumn(res, 3) == Tables.getcolumn(res, :distance) == 0
         @test Tables.getcolumn(res, 4) == Tables.getcolumn(res, :indices)
         @test Tables.getcolumn(res, 5) == Tables.getcolumn(res, :query_name) == "other"
@@ -376,7 +376,7 @@ end
         @test Tables.isrowtable(tbl)
         @test Tables.columns(tbl).query_name == ["other", "other"]
         @test Tables.columnnames(res) ==
-              (:haystack, :distance, :indices, :query, :query_name, :corpus_uuid,
+              (:document, :distance, :indices, :query, :query_name, :corpus_uuid,
                :document_uuid)
         @test sprint(explain, (first(Tables.rowtable(tbl)))) ===
               "The query \" other\" exactly matched the text \"There were other cobras \".\n"

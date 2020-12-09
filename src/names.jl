@@ -60,7 +60,7 @@ function Tables.getcolumn(m::NamedMatch, i::Int)
     if i === 1
         return m.match.query
     elseif i === 2
-        return m.match.haystack
+        return m.match.document
     elseif i === 3
         return m.match.distance
     elseif i === 4
@@ -73,8 +73,8 @@ end
 function Tables.getcolumn(m::NamedMatch, s::Symbol)
     if s === :query
         return m.match.query
-    elseif s === :haystack
-        return m.match.haystack
+    elseif s === :document
+        return m.match.document
     elseif s === :distance
         return m.match.distance
     elseif s === :indices
@@ -85,7 +85,7 @@ function Tables.getcolumn(m::NamedMatch, s::Symbol)
 end
 
 function Tables.columnnames(m::NamedMatch)
-    return (:haystack, :distance, :indices, :query, keys(m.metadata)...)
+    return (:document, :distance, :indices, :query, keys(m.metadata)...)
 end
 Tables.isrowtable(::Type{<:AbstractVector{<:NamedMatch}}) = true
 
@@ -114,13 +114,13 @@ for OT in (:Corpus, :Document)
         disjoint_keys_check(Q, obj)
         m = match(Q.query, obj)
         m === nothing && return nothing
-        return NamedMatch(m, (; Q.metadata..., obj.metadata..., m.haystack.metadata...))
+        return NamedMatch(m, (; Q.metadata..., obj.metadata..., m.document.metadata...))
     end
 
     @eval function match_all(Q::NamedQuery, obj::$(OT))
         disjoint_keys_check(Q, obj)
         matches = match_all(Q.query, obj)
-        return [NamedMatch(m, (; Q.metadata..., obj.metadata..., m.haystack.metadata...))
+        return [NamedMatch(m, (; Q.metadata..., obj.metadata..., m.document.metadata...))
                 for m in matches]
     end
 end
