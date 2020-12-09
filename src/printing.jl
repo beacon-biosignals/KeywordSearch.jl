@@ -153,5 +153,6 @@ end
 explain(m; context=40) = explain(stdout, m; context=context)
 
 function Base.show(io::IO, m::QueryMatch)
-    return print(io, "QueryMatch with distance ", m.distance, " at indices ", m.indices, ".")
+    return print(io, "QueryMatch with distance ", m.distance, " at indices ", m.indices,
+                 ".")
 end
