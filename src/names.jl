@@ -132,8 +132,6 @@ object which was matched.
 ## Example
 
 ```jldoctest
-julia> using KeywordSearch
-
 julia> document_1 = Document("One", (; document_name = "a"))
 Document with text "One ". Metadata: (document_name = "a",)
 

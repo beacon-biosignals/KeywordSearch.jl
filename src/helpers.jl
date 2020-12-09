@@ -48,7 +48,7 @@ Ensures that a word or phrase is not hyphenated or conjoined with the surroundin
 ## Example
 
 ```jldoctest
-julia> using KeywordSearch, Test
+julia> using Test
 
 julia> query = Query("word")
 Query("word")
