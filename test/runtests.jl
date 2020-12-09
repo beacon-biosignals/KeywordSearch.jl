@@ -389,6 +389,17 @@ end
     @test match_all(Query("eating"), C1) ==
           [match(Query("eating"), D1), match(Query("eating"), D2)]
 
+    eating_query = NamedQuery(Query("eating"), "eating query")
+    matches = match_all(eating_query, C1)
+    @test length(matches) == 2
+    @test matches[1].metadata == (; query_name = "eating query", corpus_uuid = C1.metadata.corpus_uuid, document_uuid = D1.metadata.document_uuid)
+    @test matches[2].metadata == (; query_name = "eating query", corpus_uuid = C1.metadata.corpus_uuid, document_uuid = D2.metadata.document_uuid)
+          
+    D1_matches = match_all(eating_query, D1)
+    @test length(D1_matches) == 1
+    @test D1_matches[1].metadata == (; query_name = "eating query", document_uuid = D1.metadata.document_uuid)
+    @test D1_matches[1].match == matches[1].match
+
     D3 = Document("There were king cobras", (; document_uuid=uuid4()))
     d_uuid = uuid4()
     D4 = Document("There were other cobras", (; document_uuid=d_uuid))

@@ -77,6 +77,12 @@ for OT in (:Corpus, :Document)
         m === nothing && return nothing
         return NamedMatch(m, (; Q.metadata..., obj.metadata..., m.haystack.metadata...))
     end
+
+    @eval function match_all(Q::NamedQuery, obj::$(OT))
+        disjoint_keys_check(Q, obj)
+        matches = match_all(Q.query, obj)
+        return [NamedMatch(m, (; Q.metadata..., obj.metadata..., m.haystack.metadata...)) for m in matches]
+    end
 end
 
 """
