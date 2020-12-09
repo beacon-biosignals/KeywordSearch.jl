@@ -124,7 +124,7 @@ Document with text "Doc 1 ". Metadata: (doc_idx = 1,)
 julia> Document("This is a longer document! Lots of words here.", (; doc_idx = 1)) # longer documents print truncated
 Document starting with "This is a longer…". Metadata: (doc_idx = 1,)
 
-````
+```
 """
 function Base.show(io::IO, D::Document)
     n, rdots = text_right_endpoint(D.text)
@@ -161,7 +161,7 @@ Set{Corpus} with 2 elements:
   Corpus with 1 documents, each with metadata keys: ()…
   Corpus with 2 documents, each with metadata keys: (:doc_idx,)…
 
-````
+```
 """
 function Base.show(io::IO, C::Corpus{T,TR}) where {T,TR}
     compact = get(io, :compact, false)
@@ -272,7 +272,7 @@ Pretty-prints a [`QueryMatch`](@ref).
 julia> match(Query("claws"), Document("Lemurs have nails instead of claws."))
 QueryMatch with distance 0 at indices 30:34.
 
-````
+```
 """
 function Base.show(io::IO, m::QueryMatch)
     return print(io, "QueryMatch with distance ", m.distance, " at indices ", m.indices,
