@@ -156,21 +156,23 @@ Corpus metadata: (name = "Lots of docs",)
 
 julia> C2 = Corpus([Document("a")], (; a = 1));
 
-julia> Set([C1, C2]) # compact printing is supported
-Set{Corpus} with 2 elements:
-  Corpus with 1 documents, each with metadata keys: ()…
-  Corpus with 2 documents, each with metadata keys: (:doc_idx,)…
+julia> [C1, C2]
+2-element Array{Corpus,1}:
+ Corpus with 2 documents, each with metadata keys: (:doc_idx,)
+ Corpus with 1 documents, each with metadata keys: ()
 
 ```
 """
 function Base.show(io::IO, C::Corpus{T,TR}) where {T,TR}
-    compact = get(io, :compact, false)
     print(io, "Corpus with ", length(C.documents), " documents, each with metadata keys: ")
     print(io, _nt_names(TR))
+    return nothing
+end
 
-    if !compact
-        print(io, "\nCorpus metadata: ", C.metadata)
-    end
+function Base.show(io::IO, ::MIME"text/plain", C::Corpus{T,TR}) where {T,TR}
+    show(io, C)
+    print(io, "\nCorpus metadata: ", C.metadata)
+    return nothing
 end
 
 function printcontext(io::IO, m::QueryMatch; context=40)

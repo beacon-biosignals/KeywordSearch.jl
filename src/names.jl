@@ -37,10 +37,13 @@ true
 
 julia> Tables.schema(Tables.rowtable(matches))
 Tables.Schema:
- :match          …  KeywordSearch.QueryMatch{Query,Document{NamedTuple{(:document_name,),Tuple{String}}},Int64,UnitRange{Int64}}
- :query_name        String
- :corpus_name       String
- :document_name     String
+ :haystack       Document{NamedTuple{(:document_name,),Tuple{String}}}
+ :distance       Int64
+ :indices        UnitRange{Int64}
+ :query          Query
+ :query_name     String
+ :corpus_name    String
+ :document_name  String
 
 ```
 """
