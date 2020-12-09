@@ -1,4 +1,6 @@
-"""
+# `@doc` needed for using a `raw` string as a docstring; raw needed because
+# of the escape characters in the regex.
+@doc raw"""
     Document{T<:NamedTuple}
 
 Represents a single string document. This object has two fields,
@@ -8,7 +10,7 @@ Represents a single string document. This object has two fields,
 
 The `text` is automatically processed by first applying the replacements
 from [`AUTOMATIC_REPLACEMENTS`](@ref), then replacing punctuation
-matching `r"[.!?><\\-]"` by spaces, and  finally by
+matching `r"[.!?><\-\n\r\v\t\f]"` by spaces, and  finally by
 adding a space to the end of the document.
 """
 struct Document{T<:NamedTuple}
@@ -36,7 +38,7 @@ function process_document(str::AbstractString)
 end
 
 function process_punct(str::AbstractString)
-    return replace(str, r"[.!?><\\-]" => " ")
+    return replace(str, r"[.!?><\-\n\r\v\t\f]" => " ")
 end
 
 """
@@ -74,6 +76,22 @@ struct Query <: AbstractQuery
     text::String
     Query(str::AbstractString) = new(process_punct(str))
 end
+
+"""
+    Base.match(query::AbstractQuery, document::Document)
+
+Looks for a match for `query` in `document`. Returns either `nothing`
+if no match is found, or a [`QueryMatch`](@ref) object.
+"""
+Base.match(query::AbstractQuery, document::Document)
+
+"""
+    match_all(query::AbstractQuery, document::Document)
+
+Looks for all matches for `query` in the document. Returns a
+`Vector` `QueryMatch` objects corresponding to all of the matches found.
+"""
+match_all(query::AbstractQuery, document::Document)
 
 function Base.match(Q::Query, R::Document)
     if (length(R.text) < length(Q.text)) || (length(Q.text) == 0)

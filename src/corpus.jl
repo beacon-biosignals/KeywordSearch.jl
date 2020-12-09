@@ -33,3 +33,21 @@ end
 function match_all(query::AbstractQuery, p::Corpus)
     return reduce(vcat, (match_all(query, document) for document in p.documents))
 end
+
+"""
+    Base.match(query::AbstractQuery, corpus::Corpus)
+
+Looks for a match for `query` in any [`Document`](@ref) in `corpus`.
+Returns either `nothing` if no match is found in any `Document`,
+or a [`QueryMatch`](@ref) object.
+"""
+Base.match(query::AbstractQuery, corpus::Corpus)
+
+"""
+    match_all(query::AbstractQuery, corpus::Corpus)
+
+Looks for all matches for `query` from all documents in `corpus`. Returns a
+`Vector` of `QueryMatch` objects corresponding to all of the matches found,
+across all doucments.
+"""
+match_all(query::AbstractQuery, corpus::Corpus)

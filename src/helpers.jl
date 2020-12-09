@@ -6,7 +6,7 @@ Currently only supports agumenting (spaces or hyphens) with (spaces, no spaces).
 
 ## Example
 
-```julia
+```jldoctest
 julia> KeywordSearch.augment("arctic wolf")
 2-element Array{String,1}:
  "arctic wolf"
@@ -39,21 +39,35 @@ function augment(Q::AbstractQuery)
     return Or(Tuple(make_q.(augment(Q.text))))
 end
 
-"""
+# `raw` needed due to the `\n` in the test
+@doc raw"""
     word_boundary(Q::AbstractQuery) -> AbstractQuery
 
 Ensures that a word or phrase is not hyphenated or conjoined with the surrounding text.
 
-## Examples
+## Example
 
-```julia
-using KeywordSearch, Test, UUIDs
-query = Query("word")
-@test match(query, Document("This matchesword ", uuid4())) !== nothing
-@test match(word_boundary(query), Document("This matches word.", uuid4())) !== nothing
-@test match(word_boundary(query), Document("This matches word ", uuid4())) !== nothing
-@test match(word_boundary(query), Document("This matches word\nNext line", uuid4())) !== nothing
-@test match(word_boundary(query), Document("This doesn't matchword ", uuid4())) === nothing
+```jldoctest
+julia> using Test
+
+julia> query = Query("word")
+Query("word")
+
+julia> @test match(query, Document("This matchesword ")) !== nothing
+Test Passed
+
+julia> @test match(word_boundary(query), Document("This matches word.")) !== nothing
+Test Passed
+
+julia> @test match(word_boundary(query), Document("This matches word ")) !== nothing
+Test Passed
+
+julia> @test match(word_boundary(query), Document("This matches word\nNext line")) !== nothing
+Test Passed
+
+julia> @test match(word_boundary(query), Document("This doesn't matchword ")) === nothing
+Test Passed
+
 ```
 """
 function word_boundary(Q::AbstractQuery)

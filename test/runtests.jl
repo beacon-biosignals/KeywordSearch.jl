@@ -1,6 +1,6 @@
 using KeywordSearch, Test, UUIDs, Random
 using Tables, StringDistances, Suppressor
-using Aqua
+using Aqua, Documenter
 
 # easier stateless testing of the global `KeywordSearch.AUTOMATIC_REPLACEMENTS`
 # by emptying it, adding replacements, calling `f`, then restoring the former
@@ -13,6 +13,12 @@ function with_replacements(f, replaces...)
     empty!(KeywordSearch.AUTOMATIC_REPLACEMENTS)
     append!(KeywordSearch.AUTOMATIC_REPLACEMENTS, former)
     return res
+end
+
+@testset "Doctests" begin
+    DocMeta.setdocmeta!(KeywordSearch, :DocTestSetup, :(using KeywordSearch);
+                        recursive=true)
+    Documenter.doctest(KeywordSearch)
 end
 
 ## Search robustness tests
@@ -315,60 +321,6 @@ end
     @test KeywordSearch.non_overlapping_matches(matches) == [(3, 5:10), (1, 15:20)]
 end
 
-@testset "Printing and `explain`" begin
-    document = Document("Short.")
-    @test occursin("Document with text", sprint(show, document))
-
-    document = Document("""Two crabs were eaten. This is a longer document
-                        with line breaks and everything. Blah blah blah.""")
-    @test occursin("starting with", sprint(show, document))
-    @test occursin("eaten…", sprint(show, document))
-
-    corpus = Corpus([document, document], NamedTuple())
-    @test occursin("with 2 documents, each with metadata keys", sprint(show, corpus))
-    @test occursin("Corpus metadata:", sprint(show, corpus))
-
-    # test that long documents without spaces are still truncated
-    @test occursin("…\".", sprint(show, Document(randstring(50))))
-
-    DL = sprint(show, DamerauLevenshtein())
-    @test sprint(show, FuzzyQuery("crab") | Query("eat")) == """
-        Or
-        ├─ FuzzyQuery("crab", $DL, 2)
-        └─ Query("eat")"""
-
-    m = match(FuzzyQuery("crab"), document)
-    answer = "The query \"crab\" matched the text \"Two crabs were eaten  This is a longer document\\nwith…\" with distance 0.\n"
-    @test sprint(explain, m) == answer
-    @test @capture_out(explain(m)) == answer
-
-    @test sprint((io, x) -> explain(io, x; context=20), m) ==
-          "The query \"crab\" matched the text \"Two crabs were eaten  This is…\" with distance 0.\n"
-
-    Q = Query("crab")
-    m = match(Q, document)
-    @test sprint(explain, m) ==
-          "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is a longer document\\nwith…\".\n"
-    @test sprint((io, x) -> explain(io, x; context=20), m) ==
-          "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is…\".\n"
-
-    named_query = NamedQuery(Q, "name")
-    @test sprint(show, named_query) == """
-        NamedQuery
-        ├─ (query_name = "name",)
-        └─ Query("crab")"""
-
-    named_match = match(named_query, document)
-    @test sprint(explain, named_match) == sprint(explain, m)
-
-    @test sprint(show, named_match) == """
-        NamedMatch
-        ├─ (query_name = "name",)
-        └─ QueryMatch with distance 0 at indices 5:8.
-           ├─ Query("crab")
-           └─ Document starting with "Two crabs were eaten…". Metadata: NamedTuple()"""
-end
-
 @testset "`Corpus` and `NamedMatch`" begin
     D1 = Document("There were crab eating macqaues!", (; document_uuid=uuid4()))
     D2 = Document("There were lobster eating macqaues!", (; document_uuid=uuid4()))
@@ -380,6 +332,22 @@ end
     @test match(Query("crab eating"), C1) == match(Query("crab eating"), D1)
     @test match_all(Query("eating"), C1) ==
           [match(Query("eating"), D1), match(Query("eating"), D2)]
+
+    eating_query = NamedQuery(Query("eating"), "eating query")
+    matches = match_all(eating_query, C1)
+    @test length(matches) == 2
+    @test matches[1].metadata ==
+          (; query_name="eating query", corpus_uuid=C1.metadata.corpus_uuid,
+           document_uuid=D1.metadata.document_uuid)
+    @test matches[2].metadata ==
+          (; query_name="eating query", corpus_uuid=C1.metadata.corpus_uuid,
+           document_uuid=D2.metadata.document_uuid)
+
+    D1_matches = match_all(eating_query, D1)
+    @test length(D1_matches) == 1
+    @test D1_matches[1].metadata ==
+          (; query_name="eating query", document_uuid=D1.metadata.document_uuid)
+    @test D1_matches[1].match == matches[1].match
 
     D3 = Document("There were king cobras", (; document_uuid=uuid4()))
     d_uuid = uuid4()

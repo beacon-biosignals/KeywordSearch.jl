@@ -2,9 +2,11 @@
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 KeywordSearch = "f977ba8c-7144-47e8-b06b-e3f658952959"
+Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 Transducers = "28d57a85-8fef-5791-bfe6-a80928e7c999"
 
 [compat]
 DataFrames = "0.22"
 Documenter = "0.25"
+Tables = "1"
 Transducers = "0.4"
