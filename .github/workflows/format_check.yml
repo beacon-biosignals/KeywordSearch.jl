@@ -22,12 +22,12 @@ jobs:
           version: ${{ matrix.julia-version }}
 
       - uses: actions/checkout@v1
-      - name: Install JuliaFormatter and format
+      - name: Instantiate `format` environment and format
         # The version of JuliaFormatter used is just to show how to specify the version. The latest
         # version would be preferrable.
         run: |
-          julia  -e 'using Pkg; Pkg.add(PackageSpec(name="JuliaFormatter", version="0.11.0"))'
-          julia  -e 'using JuliaFormatter; format(".", verbose=true)'
+          julia  --project=format -e 'using Pkg; Pkg.instantiate()'
+          julia  --project=format 'format/run.jl'
       - name: Format check
         run: |
           julia -e '
