@@ -16,7 +16,8 @@ function with_replacements(f, replaces...)
 end
 
 @testset "Doctests" begin
-    DocMeta.setdocmeta!(KeywordSearch, :DocTestSetup, :(using KeywordSearch); recursive=true)
+    DocMeta.setdocmeta!(KeywordSearch, :DocTestSetup, :(using KeywordSearch);
+                        recursive=true)
     Documenter.doctest(KeywordSearch)
 end
 
@@ -101,7 +102,6 @@ end
 
     # we count hyphens as a word boundary here (since we remove them from the documents and queries)
     @test match(word_boundary(Query("ant")), Document("This matches-ant")) !== nothing
-
 end
 
 ## A more representative test
@@ -336,12 +336,17 @@ end
     eating_query = NamedQuery(Query("eating"), "eating query")
     matches = match_all(eating_query, C1)
     @test length(matches) == 2
-    @test matches[1].metadata == (; query_name = "eating query", corpus_uuid = C1.metadata.corpus_uuid, document_uuid = D1.metadata.document_uuid)
-    @test matches[2].metadata == (; query_name = "eating query", corpus_uuid = C1.metadata.corpus_uuid, document_uuid = D2.metadata.document_uuid)
-          
+    @test matches[1].metadata ==
+          (; query_name="eating query", corpus_uuid=C1.metadata.corpus_uuid,
+           document_uuid=D1.metadata.document_uuid)
+    @test matches[2].metadata ==
+          (; query_name="eating query", corpus_uuid=C1.metadata.corpus_uuid,
+           document_uuid=D2.metadata.document_uuid)
+
     D1_matches = match_all(eating_query, D1)
     @test length(D1_matches) == 1
-    @test D1_matches[1].metadata == (; query_name = "eating query", document_uuid = D1.metadata.document_uuid)
+    @test D1_matches[1].metadata ==
+          (; query_name="eating query", document_uuid=D1.metadata.document_uuid)
     @test D1_matches[1].match == matches[1].match
 
     D3 = Document("There were king cobras", (; document_uuid=uuid4()))

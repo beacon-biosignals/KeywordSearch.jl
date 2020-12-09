@@ -6,7 +6,7 @@ using Documenter, KeywordSearch
 DocMeta.setdocmeta!(KeywordSearch, :DocTestSetup, :(using KeywordSearch); recursive=true)
 
 if success(`git diff --quiet`)
-    doctest(KeywordSearch, fix=true)
+    doctest(KeywordSearch; fix=true)
 else
     error("Git repo dirty; commit changes before fixing doctests.")
 end

@@ -85,7 +85,6 @@ if no match is found, or a [`QueryMatch`](@ref) object.
 """
 Base.match(query::AbstractQuery, document::Document)
 
-
 """
     match_all(query::AbstractQuery, document::Document)
 

@@ -20,7 +20,6 @@ struct Corpus{T<:NamedTuple,D}
     end
 end
 
-
 function Base.match(query::AbstractQuery, p::Corpus)
     for r in p.documents
         m = match(query, r)
@@ -34,7 +33,6 @@ end
 function match_all(query::AbstractQuery, p::Corpus)
     return reduce(vcat, (match_all(query, document) for document in p.documents))
 end
-
 
 """
     Base.match(query::AbstractQuery, corpus::Corpus)
