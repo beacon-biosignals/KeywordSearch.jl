@@ -8,9 +8,8 @@ Represents a single string document. This object has two fields,
 * `text::String`
 * `metadata::T`
 
-The `text` is automatically processed by first applying the replacements
-from [`AUTOMATIC_REPLACEMENTS`](@ref), then replacing punctuation
-matching `r"[.!?><\-\n\r\v\t\f]"` by spaces, and  finally by
+The `text` is automatically processed by applying the replacements
+from [`AUTOMATIC_REPLACEMENTS`](@ref) and
 adding a space to the end of the document.
 """
 struct Document{T<:NamedTuple}
@@ -19,26 +18,21 @@ struct Document{T<:NamedTuple}
 
     function Document(text::AbstractString, metadata::T) where {T}
         check_keys(T)
-        return new{T}(process_document(text), metadata)
+
+        # Add a final space to ensure that the last word is recognized
+        # as a word boundary.
+        new_text = apply_replacements(text) * " "
+        return new{T}(new_text, metadata)
     end
 end
 
 Document(text::AbstractString) = Document(text, NamedTuple())
 
-function process_document(str::AbstractString)
+
+function apply_replacements(str::AbstractString)
     # Apply automatic replacements
     # using https://github.com/JuliaLang/julia/issues/29849#issuecomment-449535743
-    str = foldl(replace, AUTOMATIC_REPLACEMENTS; init=str)
-    # Replace punctuation with a space
-    str = process_punct(str)
-    # Add a final space to ensure that the last word is recognized
-    # as a word boundary.
-    str = str * " "
-    return str
-end
-
-function process_punct(str::AbstractString)
-    return replace(str, r"[.!?><\-\n\r\v\t\f]" => " ")
+    return foldl(replace, AUTOMATIC_REPLACEMENTS; init=str)
 end
 
 """
@@ -69,12 +63,12 @@ with one field:
 
 * `text::String`
 
-The text is preprocessed by removing punctuation in
-the same way as for [`Document`](@ref)s.
+The `text` is automatically processed by applying the replacements
+from [`AUTOMATIC_REPLACEMENTS`](@ref).
 """
 struct Query <: AbstractQuery
     text::String
-    Query(str::AbstractString) = new(process_punct(str))
+    Query(str::AbstractString) = new(apply_replacements(str))
 end
 
 """
@@ -155,15 +149,15 @@ with three fields:
 * `dist::D`: the distance measure to use; defaults to `DamerauLevenshtein()`
 * `threshold::T`: the maximum threshold allowed for a match; defaults to 2.
 
-The text is preprocessed by removing punctuation in
-the same way as for [`Document`](@ref)s.
+The `text` is automatically processed by applying the replacements
+from [`AUTOMATIC_REPLACEMENTS`](@ref).
 """
 struct FuzzyQuery{D,T} <: AbstractQuery
     text::String
     dist::D
     threshold::T
     function FuzzyQuery(str::AbstractString, dist::D, threshold::T) where {D,T}
-        return new{D,T}(process_punct(str), dist, threshold)
+        return new{D,T}(apply_replacements(str), dist, threshold)
     end
 end
 
