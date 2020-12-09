@@ -13,6 +13,7 @@ NamedQuery
 ```
 
 ## Documents
+
 ```@docs
 Document
 match(::AbstractQuery, ::Document)
