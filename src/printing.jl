@@ -116,8 +116,8 @@ end
 Pretty-prints a [`Document`](@ref).
 
 # Example
-```jldoctest
 
+```jldoctest
 julia> Document("Doc 1", (; doc_idx = 1)) # short documents print completely
 Document with text "Doc 1 ". Metadata: (doc_idx = 1,)
 
