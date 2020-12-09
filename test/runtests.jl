@@ -407,8 +407,11 @@ end
         tbl = [res, res]
         @test Tables.isrowtable(tbl)
         @test Tables.columns(tbl).query_name == ["other", "other"]
-        @test Tables.columnnames(res) == (:haystack, :distance, :indices, :query, :query_name, :corpus_uuid, :document_uuid)
-        @test sprint(explain, (first(Tables.rowtable(tbl)))) === "The query \" other\" exactly matched the text \"There were other cobras \".\n"
+        @test Tables.columnnames(res) ==
+              (:haystack, :distance, :indices, :query, :query_name, :corpus_uuid,
+               :document_uuid)
+        @test sprint(explain, (first(Tables.rowtable(tbl)))) ===
+              "The query \" other\" exactly matched the text \"There were other cobras \".\n"
     end
 end
 

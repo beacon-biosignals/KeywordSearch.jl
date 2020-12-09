@@ -35,7 +35,9 @@ function Tables.getcolumn(m::NamedMatch, s::Symbol)
     end
 end
 
-Tables.columnnames(m::NamedMatch) = (:haystack, :distance, :indices, :query, keys(m.metadata)...)
+function Tables.columnnames(m::NamedMatch)
+    return (:haystack, :distance, :indices, :query, keys(m.metadata)...)
+end
 Tables.isrowtable(::Type{<:AbstractVector{<:NamedMatch}}) = true
 
 explain(io::IO, m::NamedMatch; context=40) = explain(io, m.match; context=context)
