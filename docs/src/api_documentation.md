@@ -4,21 +4,46 @@
 CurrentModule = KeywordSearch
 ```
 
-
-## Public API
+## Queries
 
 ```@docs
-Document
-Corpus
 Query
 FuzzyQuery
 NamedQuery
+```
+
+## Documents
+```@docs
+Document
+match(::AbstractQuery, ::Document)
+match_all(::AbstractQuery, ::Document)
+```
+
+## Corpuses
+
+```@docs
+Corpus
+match(::AbstractQuery, ::Corpus)
+match_all(::AbstractQuery, ::Corpus)
+```
+
+## Matches
+
+```@docs
 QueryMatch
 NamedMatch
-match
-match_all
+```
+
+## Helper functions
+
+```@docs
 explain
 augment
 word_boundary
+```
+
+## Constants
+
+```@docs
 AUTOMATIC_REPLACEMENTS
 ```
