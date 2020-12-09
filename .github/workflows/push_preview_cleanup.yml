@@ -1,9 +1,8 @@
+# from https://juliadocs.github.io/Documenter.jl/dev/man/hosting/#gh-pages-Branch
 name: Doc Preview Cleanup
-
 on:
   pull_request:
     types: [closed]
-
 jobs:
   doc-preview-cleanup:
     runs-on: ubuntu-latest
