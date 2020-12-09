@@ -1,4 +1,6 @@
-"""
+# `@doc` needed for using a `raw` string as a docstring; raw needed because
+# of the escape characters in the regex.
+@doc raw"""
     Document{T<:NamedTuple}
 
 Represents a single string document. This object has two fields,
@@ -8,7 +10,7 @@ Represents a single string document. This object has two fields,
 
 The `text` is automatically processed by first applying the replacements
 from [`AUTOMATIC_REPLACEMENTS`](@ref), then replacing punctuation
-matching `r"[.!?><\\-]"` by spaces, and  finally by
+matching `r"[.!?><\-\n\r\v\t\f]"` by spaces, and  finally by
 adding a space to the end of the document.
 """
 struct Document{T<:NamedTuple}
@@ -36,7 +38,7 @@ function process_document(str::AbstractString)
 end
 
 function process_punct(str::AbstractString)
-    return replace(str, r"[.!?><\\-]" => " ")
+    return replace(str, r"[.!?><\-\n\r\v\t\f]" => " ")
 end
 
 """
