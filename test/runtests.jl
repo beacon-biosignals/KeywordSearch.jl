@@ -102,13 +102,6 @@ end
     # we count hyphens as a word boundary here (since we remove them from the documents and queries)
     @test match(word_boundary(Query("ant")), Document("This matches-ant")) !== nothing
 
-    # from `word_boundary` docstring
-    query = Query("word")
-    @test match(query, Document("This matchesword ")) !== nothing
-    @test match(word_boundary(query), Document("This matches word.")) !== nothing
-    @test match(word_boundary(query), Document("This matches word ")) !== nothing
-    @test match(word_boundary(query), Document("This matches word\nNext line")) !== nothing
-    @test match(word_boundary(query), Document("This doesn't matchword ")) === nothing
 end
 
 ## A more representative test

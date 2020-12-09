@@ -36,19 +36,20 @@ function match_all(query::AbstractQuery, p::Corpus)
 end
 
 
+"""
+    Base.match(query::AbstractQuery, corpus::Corpus)
+
+Looks for a match for `query` in any [`Document`](@ref) in `corpus`.
+Returns either `nothing` if no match is found in any `Document`,
+or a [`QueryMatch`](@ref) object.
+"""
+Base.match(query::AbstractQuery, corpus::Corpus)
 
 """
-    Base.match(query::AbstractQuery, text::Union{Document,Corpus})
+    match_all(query::AbstractQuery, corpus::Corpus)
 
-Looks for a match for `query` in the text. Returns either `nothing`
-if no match is found, or a [`QueryMatch`](@ref) object.
+Looks for all matches for `query` from all documents in `corpus`. Returns a
+`Vector` of `QueryMatch` objects corresponding to all of the matches found,
+across all doucments.
 """
-Base.match(query::AbstractQuery, text::Union{Document,Corpus})
-
-"""
-    match_all(query::AbstractQuery, text::Union{Document,Corpus})
-
-Looks for all matches for `query` in the text. Returns either a
-`Vector` `QueryMatch` objects corresponding to all of the matches found.
-"""
-match_all(query::AbstractQuery, text::Union{Document,Corpus})
+match_all(query::AbstractQuery, corpus::Corpus)
