@@ -1,5 +1,6 @@
 using KeywordSearch, Test, UUIDs, Random
 using Tables, StringDistances, Suppressor
+using Aqua
 
 # easier stateless testing of the global `KeywordSearch.AUTOMATIC_REPLACEMENTS`
 # by emptying it, adding replacements, calling `f`, then restoring the former
@@ -471,4 +472,8 @@ end
     @test_throws ErrorException match(NamedQuery(Query("a"), (; uuid=uuid4())),
                                       Corpus([Document("abc", (; uuid=uuid4()))],
                                               (; corpus_name="a")))
+end
+
+@testset "Aqua tests" begin
+    Aqua.test_all(KeywordSearch)
 end

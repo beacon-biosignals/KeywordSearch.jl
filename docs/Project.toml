@@ -5,4 +5,6 @@ KeywordSearch = "f977ba8c-7144-47e8-b06b-e3f658952959"
 Transducers = "28d57a85-8fef-5791-bfe6-a80928e7c999"
 
 [compat]
+DataFrames = "0.22"
 Documenter = "0.25"
+Transducers = "0.4"
