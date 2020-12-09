@@ -41,25 +41,25 @@ function process_punct(str::AbstractString)
     return replace(str, r"[.!?><\-\n\r\v\t\f]" => " ")
 end
 
+abstract type AbstractQuery end
+
 """
-    QueryMatch{Q,H,D,I}
+    QueryMatch{Q<:AbstractQuery,Doc<:Document,D,I}
 
 Represents a match for an `AbstractQuery`, with four fields:
 
 * `query::Q`: the query itself
-* `haystack::H`: the [`Document`](@ref) which was matched to
+* `document::Doc`: the [`Document`](@ref) which was matched to
 * `distance::D`: the distance of the match
-* `indices::I`: the indices of where in the `haystack` the match occurred.
+* `indices::I`: the indices of where in the `document` the match occurred.
 
 """
-struct QueryMatch{Q,H,D,I}
+struct QueryMatch{Q<:AbstractQuery,Doc<:Document,D,I}
     query::Q
-    haystack::H
+    document::Doc
     distance::D
     indices::I
 end
-
-abstract type AbstractQuery end
 
 """
     Query <: AbstractQuery

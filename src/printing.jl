@@ -10,7 +10,7 @@ Base.show(io::IO, n::NoChildren) = show(io, n.x)
 AbstractTrees.children(q::NamedQuery) = (NoChildren(q.metadata), q.query)
 AbstractTrees.children(q::NamedMatch) = (NoChildren(q.metadata), q.match)
 
-AbstractTrees.children(q::QueryMatch) = (q.query, q.haystack)
+AbstractTrees.children(q::QueryMatch) = (q.query, q.document)
 
 AbstractTrees.children(q::Or) = q.subqueries
 AbstractTrees.children(q::Query) = tuple()
@@ -176,7 +176,7 @@ function Base.show(io::IO, ::MIME"text/plain", C::Corpus{T,TR}) where {T,TR}
 end
 
 function printcontext(io::IO, m::QueryMatch; context=40)
-    text = m.haystack.text
+    text = m.document.text
     L, ldots = text_left_endpoint(text, first(m.indices); approx_length=context)
     R, rdots = text_right_endpoint(text, last(m.indices); approx_length=context)
 
@@ -257,7 +257,7 @@ end
 # in case we no longer have a `QueryMatch` but at least have a row-like
 # object with the right fields.
 function explain(io::IO, row; context=40)
-    match = QueryMatch(row.query, row.haystack, row.distance, row.indices)
+    match = QueryMatch(row.query, row.document, row.distance, row.indices)
     return explain(io, match; context=context)
 end
 
