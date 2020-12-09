@@ -27,25 +27,23 @@ end
     text = "The ringtailed lemur sat in the sun."
 
     # This one matches just by the edit distance
-    @test match(FuzzyQuery(keyword),
-                Document(text)) !== nothing
+    @test match(FuzzyQuery(keyword), Document(text)) !== nothing
 
     # It even matches exactly if we augment
-    @test match(augment(Query(keyword)),
-                Document(text)) !== nothing
+    @test match(augment(Query(keyword)), Document(text)) !== nothing
 end
 
 @testset "Mistakes 3, 4: hyphenated words conjoined without hyphen or missing hyphen (with space)" begin
     keyword = "giant golden-crowned flying fox"
     # These match exactly due to removing punctuation in the documents
-    for document_text in
-        ("A giant golden crowned flying fox slept all day.", "A giant-golden-crowned flying fox slept all day.")
+    for document_text in ("A giant golden crowned flying fox slept all day.",
+         "A giant-golden-crowned flying fox slept all day.")
         @test match(Query(keyword), Document(document_text)) !== nothing
     end
 
     # These are 2 edits away, but appear to be 4 due to a possible bug
-    for document_text in
-        ("A giantgolden crowned flyingfox slept all day.", "A giantgolden crownedflying fox slept all day.")
+    for document_text in ("A giantgolden crowned flyingfox slept all day.",
+         "A giantgolden crownedflying fox slept all day.")
         @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 1),
                     Document(document_text)) === nothing
 
@@ -54,20 +52,19 @@ end
                     Document(document_text)) !== nothing
 
         @test match(augment(Query(keyword)), Document(document_text)) !== nothing
-        @test match(augment(FuzzyQuery(keyword)), Document(document_text)) !==
-              nothing
+        @test match(augment(FuzzyQuery(keyword)), Document(document_text)) !== nothing
     end
 
     # This one seems like 3 edits away, but since the same substring can't be edited more than once via the
     # "restricted edit distance" used by `DamerauLevenshtein()`, it comes out as 6 edits.
     document_text = "A giant goldencrownedflying fox slept all day."
     keyword = "giant golden-crowned flying fox"
-    @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 1),
-                Document(document_text)) === nothing
-    @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 2),
-                Document(document_text)) === nothing
-    @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 6),
-                Document(document_text)) !== nothing
+    @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 1), Document(document_text)) ===
+          nothing
+    @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 2), Document(document_text)) ===
+          nothing
+    @test match(FuzzyQuery(keyword, DamerauLevenshtein(), 6), Document(document_text)) !==
+          nothing
 
     # document_text = "A giant goldencrownedflying fox slept all day."
 
@@ -90,7 +87,8 @@ end
     @test match(Query(" ant "), Document("This does not match anteater here")) === nothing
     @test match(Query("ant"), Document("This does match anteater")) !== nothing
 
-    @test match(word_boundary(Query("ant")), Document("This does match anteater")) === nothing # part of a word is not OK
+    @test match(word_boundary(Query("ant")), Document("This does match anteater")) ===
+          nothing # part of a word is not OK
     @test match(word_boundary(Query("ant")), Document("This matches ant here")) !== nothing # a separate word is OK
     @test match(word_boundary(Query("ant")), Document("This matches ant")) !== nothing # end of string is OK
     @test match(word_boundary(Query("ant")), Document("This matches ant.")) !== nothing # period is OK
@@ -159,8 +157,7 @@ written, or badly written.  That is all.
     # test nesting
     query = (Query("a") | Query("b")) | (Query("c") | Query("d"))
     @test match(query, document) !== nothing
-    @test query isa
-          KeywordSearch.Or{Tuple{Query,Query,Query,Query}}
+    @test query isa KeywordSearch.Or{Tuple{Query,Query,Query,Query}}
     @test length(query) == 4
 end
 
@@ -351,7 +348,7 @@ end
     Q = Query("crab")
     m = match(Q, document)
     @test sprint(explain, m) ==
-        "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is a longer document\\nwith…\".\n"
+          "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is a longer document\\nwith…\".\n"
     @test sprint((io, x) -> explain(io, x; context=20), m) ==
           "The query \"crab\" exactly matched the text \"Two crabs were eaten  This is…\".\n"
 
@@ -394,8 +391,7 @@ end
     @test match(Q, C1) === nothing
     res = match(Q, C2)
     @test res isa KeywordSearch.NamedMatch
-    @test res.metadata ==
-          (; query_name="other", corpus_uuid=C2_uuid, document_uuid=d_uuid)
+    @test res.metadata == (; query_name="other", corpus_uuid=C2_uuid, document_uuid=d_uuid)
     @test res.match == match(Q.query, D4)
 
     @test match(Q, D4).match == match(Q.query, D4)
@@ -417,7 +413,8 @@ end
 end
 
 @testset "`AUTOMATIC_REPLACEMENTS`" begin
-    @test with_replacements(() -> Document("abc"), "a" => "b") == with_replacements(() -> Document("bbc"))
+    @test with_replacements(() -> Document("abc"), "a" => "b") ==
+          with_replacements(() -> Document("bbc"))
 end
 
 ## Edge cases
@@ -463,14 +460,15 @@ end
     @test_throws ArgumentError NamedQuery(Query("abc"), (; match=1))
 
     # Cannot have the same metadata keys in a corpus and a document it contains
-    @test_throws ErrorException Corpus([Document("abc", (; uuid=uuid4()))], (; uuid=uuid4()))
+    @test_throws ErrorException Corpus([Document("abc", (; uuid=uuid4()))],
+                                       (; uuid=uuid4()))
 
     # Cannot have the same metadata keys in a `NamedQuery` and an object it is matched to
     @test_throws ErrorException match(NamedQuery(Query("a"), (; uuid=uuid4())),
                                       Document("abc", (; uuid=uuid4())))
     @test_throws ErrorException match(NamedQuery(Query("a"), (; uuid=uuid4())),
                                       Corpus([Document("abc", (; uuid=uuid4()))],
-                                              (; corpus_name="a")))
+                                             (; corpus_name="a")))
 end
 
 @testset "Aqua tests" begin
