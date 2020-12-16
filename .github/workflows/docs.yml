@@ -14,7 +14,8 @@ on:
       - 'src/**'
       - 'docs/**'
 jobs:
-  build:
+  build-docs:
+    name: Build documentation (${{ github.event_name }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
