@@ -1,8 +1,7 @@
 using JuliaFormatter
 
 function main()
-    perfect = format(joinpath(@__DIR__, ".."); style=YASStyle(), whitespace_typedefs=false,
-                     verbose=true)
+    perfect = format(joinpath(@__DIR__, ".."); style=YASStyle(), verbose=true)
     if perfect
         @info "Linting complete - no files altered"
     else
