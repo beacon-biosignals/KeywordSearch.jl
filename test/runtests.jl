@@ -1,6 +1,6 @@
 using KeywordSearch, Test, UUIDs, Random
 using Tables, StringDistances, Suppressor
-using Aqua
+using Aqua, Documenter
 
 # easier stateless testing of the global `KeywordSearch.AUTOMATIC_REPLACEMENTS`
 # by emptying it, adding replacements, calling `f`, then restoring the former
@@ -438,4 +438,11 @@ end
 
 @testset "Aqua tests" begin
     Aqua.test_all(KeywordSearch)
+end
+
+# Doctests for coverage!
+@testset "Doctests" begin
+    DocMeta.setdocmeta!(KeywordSearch, :DocTestSetup, :(using KeywordSearch);
+                        recursive=true)
+    Documenter.doctest(KeywordSearch)
 end
