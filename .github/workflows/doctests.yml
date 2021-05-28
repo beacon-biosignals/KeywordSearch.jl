@@ -21,7 +21,11 @@ jobs:
       - name: Install dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Fix doctests
-        run: julia  --project=docs 'docs/fix_doctests.jl'
+        run: julia --code-coverage --project=docs 'docs/fix_doctests.jl'
+      - uses: julia-actions/julia-processcoverage@v1
+      - uses: codecov/codecov-action@v1
+        with:
+          file: lcov.info
       - uses: reviewdog/action-suggester@v1
         if: github.event_name == 'pull_request'
         with:
