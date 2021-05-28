@@ -1,4 +1,4 @@
-name: format-check
+name: doctests
 on:
   push:
     branches:
@@ -7,24 +7,23 @@ on:
     tags: '*'
   pull_request:
 jobs:
-  format-check:
-    name: Format check (Julia ${{ matrix.version }} - ${{ github.event_name }})
+  doctests:
+    name: Doctests (Julia ${{ matrix.version }} - ${{ github.event_name }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        julia-version: [1.5.3]
+        julia-version: [1.6.1]
     steps:
       - uses: julia-actions/setup-julia@latest
         with:
           version: ${{ matrix.julia-version }}
-
       - uses: actions/checkout@v1
-      - name: Instantiate `format` environment and format
+      - name: Instantiate `docs` environment and run
         run: |
-          julia  --project=format -e 'using Pkg; Pkg.instantiate()'
-          julia  --project=format 'format/run.jl'
+          julia  --project=docs -e 'using Pkg; Pkg.instantiate()'
+          julia  --project=docs 'docs/fix_doctests.jl'
       - uses: reviewdog/action-suggester@v1
         if: github.event_name == 'pull_request'
         with:
-          tool_name: JuliaFormatter
+          tool_name: Documenter (doctests)
           fail_on_error: true
