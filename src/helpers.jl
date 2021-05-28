@@ -8,16 +8,17 @@ Currently only supports agumenting (spaces or hyphens) with (spaces, no spaces).
 
 ```jldoctest
 julia> KeywordSearch.augment("arctic wolf")
-2-element Array{String,1}:
+2-element Vector{String}:
  "arctic wolf"
+ "arcticwolf"
  
 ```
 """
 function augment(term)
     terms = String[]
-words = split(term, char -> isspace(char) || char == '-')
+    words = split(term, char -> isspace(char) || char == '-')
     n_words = length(words)
-    joiners = (" ","")
+    joiners = (" ", "")
     # This could be optimized
     for joins in Iterators.product(Iterators.repeated(joiners, n_words - 1)...)
         word = ""
