@@ -18,10 +18,10 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
       - uses: actions/checkout@v1
-      - name: Instantiate `docs` environment and run
-        run: |
-          julia  --project=docs -e 'using Pkg; Pkg.instantiate()'
-          julia  --project=docs 'docs/fix_doctests.jl'
+      - name: Install dependencies
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+      - name: Fix doctests
+        run: julia  --project=docs 'docs/fix_doctests.jl'
       - uses: reviewdog/action-suggester@v1
         if: github.event_name == 'pull_request'
         with:
