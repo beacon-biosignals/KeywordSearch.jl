@@ -1,6 +1,6 @@
 using KeywordSearch, Test, UUIDs, Random
 using Tables, StringDistances, Suppressor
-using Aqua, Documenter
+using Aqua
 
 # easier stateless testing of the global `KeywordSearch.AUTOMATIC_REPLACEMENTS`
 # by emptying it, adding replacements, calling `f`, then restoring the former
@@ -13,12 +13,6 @@ function with_replacements(f, replaces...)
     empty!(KeywordSearch.AUTOMATIC_REPLACEMENTS)
     append!(KeywordSearch.AUTOMATIC_REPLACEMENTS, former)
     return res
-end
-
-@testset "Doctests" begin
-    DocMeta.setdocmeta!(KeywordSearch, :DocTestSetup, :(using KeywordSearch);
-                        recursive=true)
-    Documenter.doctest(KeywordSearch)
 end
 
 ## Search robustness tests

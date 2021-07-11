@@ -8,7 +8,7 @@ Currently only supports agumenting (spaces or hyphens) with (spaces, no spaces).
 
 ```jldoctest
 julia> KeywordSearch.augment("arctic wolf")
-2-element Array{String,1}:
+2-element Vector{String}:
  "arctic wolf"
  "arcticwolf"
  
