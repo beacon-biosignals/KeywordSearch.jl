@@ -157,7 +157,7 @@ Corpus metadata: (name = "Lots of docs",)
 julia> C2 = Corpus([Document("a")], (; a = 1));
 
 julia> [C1, C2]
-2-element Array{Corpus,1}:
+2-element Vector{Corpus}:
  Corpus with 2 documents, each with metadata keys: (:doc_idx,)
  Corpus with 1 documents, each with metadata keys: ()
 
