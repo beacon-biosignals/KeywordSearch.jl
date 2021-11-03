@@ -378,7 +378,7 @@ end
               (:document, :distance, :indices, :query, :query_name, :corpus_uuid,
                :document_uuid)
         @test sprint(explain, (first(Tables.rowtable(tbl)))) ===
-              "The query \" other\" exactly matched the text \"There were other cobras \".\n"
+              "The query \" other\" exactly matched the text \" There were other cobras \".\n"
     end
 end
 
