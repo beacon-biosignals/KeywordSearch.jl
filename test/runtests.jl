@@ -96,6 +96,11 @@ end
 
     # we count hyphens as a word boundary here (since we remove them from the documents and queries)
     @test match(word_boundary(Query("ant")), Document("This matches-ant")) !== nothing
+
+    # Test that the first/last word in a document can be matched by a word boundary
+    @test match(word_boundary(Query("abcd")), Document("abcd")) !== nothing
+    @test match(word_boundary(Query("abcd")), Document("abcd hello")) !== nothing
+    @test match(word_boundary(Query("abcd")), Document("hello abcd")) !== nothing
 end
 
 ## A more representative test
