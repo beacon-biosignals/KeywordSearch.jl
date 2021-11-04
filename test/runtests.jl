@@ -96,6 +96,11 @@ end
 
     # we count hyphens as a word boundary here (since we remove them from the documents and queries)
     @test match(word_boundary(Query("ant")), Document("This matches-ant")) !== nothing
+
+    # Test that the first/last word in a document can be matched by a word boundary
+    @test match(word_boundary(Query("abcd")), Document("abcd")) !== nothing
+    @test match(word_boundary(Query("abcd")), Document("abcd hello")) !== nothing
+    @test match(word_boundary(Query("abcd")), Document("hello abcd")) !== nothing
 end
 
 ## A more representative test
@@ -373,7 +378,7 @@ end
               (:document, :distance, :indices, :query, :query_name, :corpus_uuid,
                :document_uuid)
         @test sprint(explain, (first(Tables.rowtable(tbl)))) ===
-              "The query \" other\" exactly matched the text \"There were other cobras \".\n"
+              "The query \" other\" exactly matched the text \" There were other cobras \".\n"
     end
 end
 

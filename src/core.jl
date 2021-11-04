@@ -19,9 +19,9 @@ struct Document{T<:NamedTuple}
     function Document(text::AbstractString, metadata::T) where {T}
         check_keys(T)
 
-        # Add a final space to ensure that the last word is recognized
+        # Add an initial and final space to ensure that the last word is recognized
         # as a word boundary.
-        new_text = apply_replacements(text) * " "
+        new_text = " " * apply_replacements(text) * " "
         return new{T}(new_text, metadata)
     end
 end
