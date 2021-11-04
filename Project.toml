@@ -1,7 +1,7 @@
 name = "KeywordSearch"
 uuid = "f977ba8c-7144-47e8-b06b-e3f658952959"
 authors = ["Beacon Biosignals, Inc"]
-version = "0.3.1"
+version = "0.4.0"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
