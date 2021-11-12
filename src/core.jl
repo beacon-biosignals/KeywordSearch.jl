@@ -16,7 +16,8 @@ struct Document{T<:NamedTuple}
     text::String
     metadata::T
 
-    function Document(text::AbstractString, metadata::T; replacements=AUTOMATIC_REPLACEMENTS) where {T}
+    function Document(text::AbstractString, metadata::T;
+                      replacements=AUTOMATIC_REPLACEMENTS) where {T}
         check_keys(T)
         new_text = apply_replacements(text; replacements)
 
@@ -74,7 +75,9 @@ from `replacements` (which defaults to [`AUTOMATIC_REPLACEMENTS`](@ref)).
 """
 struct Query <: AbstractQuery
     text::String
-    Query(text::AbstractString; replacements=AUTOMATIC_REPLACEMENTS) = new(apply_replacements(text; replacements))
+    function Query(text::AbstractString; replacements=AUTOMATIC_REPLACEMENTS)
+        return new(apply_replacements(text; replacements))
+    end
 end
 
 """
@@ -162,7 +165,8 @@ struct FuzzyQuery{D,T} <: AbstractQuery
     text::String
     dist::D
     threshold::T
-    function FuzzyQuery(text::AbstractString, dist::D, threshold::T; replacements=AUTOMATIC_REPLACEMENTS) where {D,T}
+    function FuzzyQuery(text::AbstractString, dist::D, threshold::T;
+                        replacements=AUTOMATIC_REPLACEMENTS) where {D,T}
         return new{D,T}(apply_replacements(text; replacements), dist, threshold)
     end
 end

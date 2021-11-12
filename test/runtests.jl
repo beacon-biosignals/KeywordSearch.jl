@@ -84,12 +84,12 @@ end
     # Check call-side replacements
     document = Document("""
         A xxxs frog sat on a branch.
-        """; replacements = ["xxxs frog" => "Darwins frog"])
+        """; replacements=["xxxs frog" => "Darwins frog"])
     @test match(Query("Darwins frog"), document) !== nothing
     @test match(Query("xxxs frog"), document) === nothing
 
-    @test Query("xxxs frog"; replacements = ["xxxs frog" => "Darwins frog"]).text == "Darwins frog"
-    
+    @test Query("xxxs frog"; replacements=["xxxs frog" => "Darwins frog"]).text ==
+          "Darwins frog"
 end
 
 @testset "Mistake 6: Search terms that are subsets of other general terms (like acrynoms)" begin
