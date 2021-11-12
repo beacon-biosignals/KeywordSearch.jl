@@ -385,6 +385,29 @@ end
 @testset "`AUTOMATIC_REPLACEMENTS`" begin
     @test with_replacements(() -> Document("abc"), "a" => "b") ==
           with_replacements(() -> Document("bbc"))
+
+    @testset "Default replacements" begin
+        @test Document("????hello??.???").text == " hello "
+        @test Document("   hello     goodbye   ??").text == " hello goodbye "
+        @test Document("   hello  !   goodbye   ??").text == " hello goodbye "
+        @test Document("   hello   \n  goodbye   ??").text == " hello goodbye "
+        @test Document("   hello \t\t  goodbye   ??").text == " hello goodbye "
+
+        # Make sure we can match them too:
+        @test match(Query("hello goodbye"), Document("   hello     goodbye   ??")) !==
+              nothing
+        @test match(Query("hello ??? goodbye"), Document("   hello     goodbye   ??")) !==
+              nothing
+        @test match(Query("hello   \t   \n goodbye"),
+                    Document("   hello     goodbye   ??")) !== nothing
+    end
+end
+
+@testset "`Document` constructor start/end space" begin
+    @test Document("hello").text == " hello "
+    @test Document("hello ").text == " hello "
+    @test Document(" hello").text == " hello "
+    @test Document(" hello ").text == " hello "
 end
 
 ## Edge cases
