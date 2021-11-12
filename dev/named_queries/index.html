@@ -31,16 +31,16 @@ Corpus metadata: (name = &quot;docs&quot;,)
 
 julia&gt; corpus1.documents
 10-element Array{Document{NamedTuple{(:doc_index,),Tuple{Int64}}},1}:
- Document with text &quot; jittQcatxtx5 &quot;. Metadata: (doc_index = 1,)
- Document starting with &quot; ln4xoDmm3ikoalarbchCw…&quot;. Metadata: (doc_index = 2,)
- Document starting with &quot; rfXOHGVcatGGM5q…&quot;. Metadata: (doc_index = 3,)
- Document starting with &quot; noLtCXBEWvcatSQHgg…&quot;. Metadata: (doc_index = 4,)
- Document starting with &quot; vUTRZopposumeQ1QGNDNg…&quot;. Metadata: (doc_index = 5,)
- Document with text &quot; ZyIDKYhocat1 &quot;. Metadata: (doc_index = 6,)
- Document with text &quot; wjakNcattTP86Y &quot;. Metadata: (doc_index = 7,)
- Document with text &quot; zn7hcatokeL2H &quot;. Metadata: (doc_index = 8,)
- Document starting with &quot; oRf4v4cdgaD5jTb3sgW…&quot;. Metadata: (doc_index = 9,)
- Document with text &quot; u7kvBcatA &quot;. Metadata: (doc_index = 10,)
+ Document with text &quot; ZihvKfcati9K4m &quot;. Metadata: (doc_index = 1,)
+ Document starting with &quot; w15txPj6koalasCfRXqQ4BC…&quot;. Metadata: (doc_index = 2,)
+ Document starting with &quot; 35shropposum8EK…&quot;. Metadata: (doc_index = 3,)
+ Document starting with &quot; mR7Yopposum38sAEvjd5…&quot;. Metadata: (doc_index = 4,)
+ Document starting with &quot; 0QpwRscatfwUKqq…&quot;. Metadata: (doc_index = 5,)
+ Document with text &quot; SVkINDcatK &quot;. Metadata: (doc_index = 6,)
+ Document starting with &quot; 2lMhObbiekoala3EubnG…&quot;. Metadata: (doc_index = 7,)
+ Document starting with &quot; wFjPuOHx9opposumbD28BS…&quot;. Metadata: (doc_index = 8,)
+ Document starting with &quot; nGEbslMakoala29lS7yjdc…&quot;. Metadata: (doc_index = 9,)
+ Document with text &quot; ckYAdg6eTI4kZ &quot;. Metadata: (doc_index = 10,)
 
 julia&gt; corpus2 = Corpus([Document(randstring(rand(1:10)), (; doc_index=2 * j)) for j in 1:10],
                         (; name=&quot;other docs&quot;))
@@ -61,10 +61,10 @@ julia&gt; DataFrame(matches)
  Row │ document                           distance  indices    query           ⋯
      │ Document…                          Int64     UnitRang…  Abstract…       ⋯
 ─────┼──────────────────────────────────────────────────────────────────────────
-   1 │ Document starting with &quot; ln4xoDm…         2  5:7        FuzzyQuery{Dame ⋯
-   2 │ Document with text &quot; O1g2P &quot;. Me…         2  2:4        FuzzyQuery{Dame
-   3 │ Document with text &quot; jittQcatxtx…         0  7:9        FuzzyQuery{Dame
-   4 │ Document starting with &quot; ln4xoDm…         0  12:16      Query(&quot;koala&quot;)
+   1 │ Document starting with &quot; w15txPj…         2  10:12      FuzzyQuery{Dame ⋯
+   2 │ Document with text &quot; iosFNv6 &quot;. …         2  2:4        FuzzyQuery{Dame
+   3 │ Document with text &quot; ZihvKfcati9…         0  8:10       FuzzyQuery{Dame
+   4 │ Document starting with &quot; w15txPj…         0  10:14      Query(&quot;koala&quot;)
                                                                4 columns omitted</code></pre><p>We can also make use of <a href="https://github.com/JuliaFolds/Transducers.jl">Transducers.jl</a> to easily multithread or parallelize across cores via <code>tcollect</code> or <code>dcollect</code>:</p><pre><code class="language-julia-repl">julia&gt; using Transducers
 
 julia&gt; matches = tcollect(Filter(!isnothing)(MapSplat(match)(Iterators.product(queries, corpuses))));
@@ -74,8 +74,8 @@ julia&gt; DataFrame(matches)
  Row │ document                           distance  indices    query           ⋯
      │ Document…                          Int64     UnitRang…  Abstract…       ⋯
 ─────┼──────────────────────────────────────────────────────────────────────────
-   1 │ Document starting with &quot; ln4xoDm…         2  5:7        FuzzyQuery{Dame ⋯
-   2 │ Document with text &quot; jittQcatxtx…         0  7:9        FuzzyQuery{Dame
-   3 │ Document starting with &quot; ln4xoDm…         0  12:16      Query(&quot;koala&quot;)
-   4 │ Document with text &quot; O1g2P &quot;. Me…         2  2:4        FuzzyQuery{Dame
-                                                               4 columns omitted</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial/">« Quick tutorial</a><a class="docs-footer-nextpage" href="../api_documentation/">API Documentation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 12 November 2021 22:48">Friday 12 November 2021</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+   1 │ Document starting with &quot; w15txPj…         2  10:12      FuzzyQuery{Dame ⋯
+   2 │ Document with text &quot; ZihvKfcati9…         0  8:10       FuzzyQuery{Dame
+   3 │ Document starting with &quot; w15txPj…         0  10:14      Query(&quot;koala&quot;)
+   4 │ Document with text &quot; iosFNv6 &quot;. …         2  2:4        FuzzyQuery{Dame
+                                                               4 columns omitted</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial/">« Quick tutorial</a><a class="docs-footer-nextpage" href="../api_documentation/">API Documentation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 12 November 2021 22:53">Friday 12 November 2021</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
