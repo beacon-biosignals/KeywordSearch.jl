@@ -405,9 +405,12 @@ end
         @test Document("   hello \t\t  goodbye   ??").text == " hello goodbye "
         
         # Make sure we can match them too:
-        @test match(Query("hello goodbye"), Document("   hello     goodbye   ??")) !== nothing
-        @test match(Query("hello ??? goodbye"), Document("   hello     goodbye   ??")) !== nothing
-        @test match(Query("hello   \t   \n goodbye"), Document("   hello     goodbye   ??")) !== nothing
+        @test match(Query("hello goodbye"), Document("   hello     goodbye   ??")) !==
+              nothing
+        @test match(Query("hello ??? goodbye"), Document("   hello     goodbye   ??")) !==
+              nothing
+        @test match(Query("hello   \t   \n goodbye"),
+                    Document("   hello     goodbye   ??")) !== nothing
     end
 end
 
