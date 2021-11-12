@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Quick tutorial · KeywordSearch</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">KeywordSearch</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Quick tutorial</a></li><li><a class="tocitem" href="../named_queries/">Tables of matches</a></li><li><a class="tocitem" href="../api_documentation/">API Documentation</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Quick tutorial</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Quick tutorial</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/beacon-biosignals/KeywordSearch.jl/blob/master/docs/src/tutorial.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Quick-tutorial"><a class="docs-heading-anchor" href="#Quick-tutorial">Quick tutorial</a><a id="Quick-tutorial-1"></a><a class="docs-heading-anchor-permalink" href="#Quick-tutorial" title="Permalink"></a></h1><p>In this example, we will use some sample text modified from the public domain text <em>Aristotle&#39;s History of Animals</em> <a href="http://www.gutenberg.org/files/59058/59058-0.txt">http://www.gutenberg.org/files/59058/59058-0.txt</a>.</p><pre><code class="language-julia-repl">julia&gt; using KeywordSearch, Random
+
+julia&gt; text_with_typos = Document(&quot;&quot;&quot;
+           Some animals have fet, others have noone; of the former some have
+           two feet, as mankind and birdsonly; others have four, as the lizard
+           and the dog; others, as the scolopendra and bee, have many feet; but
+           all have their feet in pairs.
+           &quot;&quot;&quot;)
+Document starting with &quot;Some animals have…&quot;. Metadata: NamedTuple()
+
+julia&gt; fuzzy_query = FuzzyQuery(&quot;birds only&quot;)
+FuzzyQuery{DamerauLevenshtein{Nothing},Int64}(&quot;birds only&quot;, DamerauLevenshtein{Nothing}(nothing), 2)
+
+julia&gt; m = match(fuzzy_query, text_with_typos)
+QueryMatch with distance 2 at indices 91:100.
+
+julia&gt; explain(m)
+The query &quot;birds only&quot; matched the text &quot;…former some have two feet, as mankind and birdsonly; others have four, as the lizard and the…&quot; with distance 2.</code></pre><p>Here, you&#39;ll notice an exact query does not match, since the words &quot;birds&quot; and &quot;only&quot; have been conjoined:</p><pre><code class="language-julia-repl">julia&gt; exact_query = Query(&quot;birds only&quot;)
+Query(&quot;birds only&quot;)
+
+julia&gt; match(exact_query, text_with_typos) # nothing, no exact match</code></pre><p>KeywordSearch offers the <a href="../api_documentation/#KeywordSearch.augment"><code>augment</code></a> function specifically to address mis-conjoined words:</p><pre><code class="language-julia-repl">julia&gt; augmented_query = augment(exact_query)
+Or
+├─ Query(&quot;birds only&quot;)
+└─ Query(&quot;birdsonly&quot;)
+
+julia&gt; m2 = match(augmented_query, text_with_typos) # now it matches
+QueryMatch with distance 0 at indices 92:100.
+
+julia&gt; m2.query # which of the two queries in the `Or` matched?
+Query(&quot;birdsonly&quot;)</code></pre><p>Here, <code>augment</code> generated an <code>Or</code> query, but we can generate one ourselves:</p><pre><code class="language-julia-repl">julia&gt; dog_or_cat = Query(&quot;dog&quot;) | Query(&quot;cat&quot;)
+Or
+├─ Query(&quot;dog&quot;)
+└─ Query(&quot;cat&quot;)
+
+julia&gt; m3 = match(dog_or_cat, text_with_typos)
+QueryMatch with distance 0 at indices 143:145.
+
+julia&gt; explain(m3)
+The query &quot;dog&quot; exactly matched the text &quot;…others have four, as the lizard and the dog; others, as the scolopendra and bee, have…&quot;.</code></pre><p>Note also that <a href="../api_documentation/#KeywordSearch.FuzzyQuery"><code>FuzzyQuery</code></a> by default uses the <code>DamerauLevenshtein()</code> distance from <a href="https://github.com/matthieugomez/StringDistances.jl">StringDistances.jl</a>, and searches for a match within a cutoff of 2 but you can pass it another distance or use another cutoff:</p><pre><code class="language-julia-repl">julia&gt; fuzzy_query_2 = FuzzyQuery(&quot;brid nly&quot;, DamerauLevenshtein(), 4)
+FuzzyQuery{DamerauLevenshtein{Nothing},Int64}(&quot;brid nly&quot;, DamerauLevenshtein{Nothing}(nothing), 4)
+
+julia&gt; m4 = match(fuzzy_query_2, text_with_typos)
+QueryMatch with distance 4 at indices 92:99.
+
+julia&gt; explain(m4)
+The query &quot;brid nly&quot; matched the text &quot;…former some have two feet, as mankind and birdsonly; others have four, as the lizard and the…&quot; with distance 4.</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../named_queries/">Tables of matches »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 12 December 2020 18:07">Saturday 12 December 2020</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
