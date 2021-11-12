@@ -19,7 +19,7 @@ By default, `AUTOMATIC_REPLACEMENTS` contains only one replacement:
 ```jldoctest
 julia> KeywordSearch.AUTOMATIC_REPLACEMENTS
 1-element Vector{Pair{Union{Regex, String}, String}}:
- r"[.!?><\-\n\r\v\t\f\s]+" => " "
+ r"[.!?><\-\v\f\s]+" => " "
 
 ```
 
