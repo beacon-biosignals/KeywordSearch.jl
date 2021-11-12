@@ -411,6 +411,13 @@ end
     end
 end
 
+@testset "`Document` constructor start/end space" begin
+    @test Document("hello").text == " hello "
+    @test Document("hello ").text == " hello "
+    @test Document(" hello").text == " hello "
+    @test Document(" hello ").text == " hello "
+end
+
 ## Edge cases
 
 @testset "Query vs document lengths" begin
