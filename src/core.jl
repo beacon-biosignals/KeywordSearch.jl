@@ -18,10 +18,17 @@ struct Document{T<:NamedTuple}
 
     function Document(text::AbstractString, metadata::T) where {T}
         check_keys(T)
+        new_text = apply_replacements(text)
 
         # Add an initial and final space to ensure that the last word is recognized
-        # as a word boundary.
-        new_text = " " * apply_replacements(text) * " "
+        # as a word boundary, if necessary.
+        if !startswith(new_text, " ") && !endswith(new_text, " ")
+            new_text = string(" ", new_text, " ")
+        elseif !startswith(new_text, " ")
+            new_text = string(" ", new_text)
+        elseif !endswith(new_text, " ")
+            new_text = string(new_text, " ")
+        end
         return new{T}(new_text, metadata)
     end
 end

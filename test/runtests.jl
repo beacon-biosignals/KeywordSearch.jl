@@ -385,6 +385,23 @@ end
 @testset "`AUTOMATIC_REPLACEMENTS`" begin
     @test with_replacements(() -> Document("abc"), "a" => "b") ==
           with_replacements(() -> Document("bbc"))
+
+    @testset "Default replacements" begin
+        @test Document("????hello??.???").text == " hello "
+        @test Document("   hello     goodbye   ??").text == " hello goodbye "
+        @test Document("   hello  !   goodbye   ??").text == " hello goodbye "
+        @test Document("   hello   \n  goodbye   ??").text == " hello goodbye "
+
+        # Has tabs:
+        @test Document("   hello          goodbye   ??").text == " hello goodbye "
+        
+        # Make sure we can match them too:
+        @test match(Query("hello goodbye"), Document("   hello     goodbye   ??")) !== nothing
+        @test match(Query("hello ??? goodbye"), Document("   hello     goodbye   ??")) !== nothing
+
+        # this has got tabs too
+        @test match(Query("hello            \n goodbye"), Document("   hello     goodbye   ??")) !== nothing
+    end
 end
 
 ## Edge cases
