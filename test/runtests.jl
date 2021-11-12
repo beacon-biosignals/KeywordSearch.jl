@@ -80,6 +80,16 @@ end
     end
     @test match(Query("Darwins frog"), document) !== nothing
     @test match(Query("xxxs frog"), document) === nothing
+
+    # Check call-side replacements
+    document = Document("""
+        A xxxs frog sat on a branch.
+        """; replacements = ["xxxs frog" => "Darwins frog"])
+    @test match(Query("Darwins frog"), document) !== nothing
+    @test match(Query("xxxs frog"), document) === nothing
+
+    @test Query("xxxs frog"; replacements = ["xxxs frog" => "Darwins frog"]).text == "Darwins frog"
+    
 end
 
 @testset "Mistake 6: Search terms that are subsets of other general terms (like acrynoms)" begin
@@ -385,6 +395,7 @@ end
 @testset "`AUTOMATIC_REPLACEMENTS`" begin
     @test with_replacements(() -> Document("abc"), "a" => "b") ==
           with_replacements(() -> Document("bbc"))
+    @test Document("abc"; replacements=["a" => "b"]) == Document("bbc")
 
     @testset "Default replacements" begin
         @test Document("????hello??.???").text == " hello "
@@ -394,7 +405,7 @@ end
 
         # Has tabs:
         @test Document("   hello          goodbye   ??").text == " hello goodbye "
-        
+
         # Make sure we can match them too:
         @test match(Query("hello goodbye"), Document("   hello     goodbye   ??")) !== nothing
         @test match(Query("hello ??? goodbye"), Document("   hello     goodbye   ??")) !== nothing
