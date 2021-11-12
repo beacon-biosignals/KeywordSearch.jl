@@ -1,7 +1,7 @@
 # `@doc` needed for using a `raw` string as a docstring; raw needed because
 # of the escape characters in the regex.
 @doc raw"""
-    Document{T<:NamedTuple}
+    Document(text::AbstractString, metadata::T; replacements=AUTOMATIC_REPLACEMENTS) where {T<:NamedTuple}
 
 Represents a single string document. This object has two fields,
 
@@ -9,16 +9,17 @@ Represents a single string document. This object has two fields,
 * `metadata::T`
 
 The `text` is automatically processed by applying the replacements
-from [`AUTOMATIC_REPLACEMENTS`](@ref) and
-adding a space to the end of the document.
+from `replacements`, which defaults to [`AUTOMATIC_REPLACEMENTS`](@ref) and
+adding a space to the start and end of the document (if one doesn't exist already).
 """
 struct Document{T<:NamedTuple}
     text::String
     metadata::T
 
-    function Document(text::AbstractString, metadata::T) where {T}
+    function Document(text::AbstractString, metadata::T;
+                      replacements=AUTOMATIC_REPLACEMENTS) where {T}
         check_keys(T)
-        new_text = apply_replacements(text)
+        new_text = apply_replacements(text; replacements)
 
         # Add an initial and final space to ensure that the last word is recognized
         # as a word boundary, if necessary.
@@ -33,12 +34,12 @@ struct Document{T<:NamedTuple}
     end
 end
 
-Document(text::AbstractString) = Document(text, NamedTuple())
+Document(text::AbstractString; kw...) = Document(text, NamedTuple(); kw...)
 
-function apply_replacements(str::AbstractString)
+function apply_replacements(str::AbstractString; replacements=AUTOMATIC_REPLACEMENTS)
     # Apply automatic replacements
     # using https://github.com/JuliaLang/julia/issues/29849#issuecomment-449535743
-    return foldl(replace, AUTOMATIC_REPLACEMENTS; init=str)
+    return foldl(replace, replacements; init=str)
 end
 
 abstract type AbstractQuery end
@@ -62,7 +63,7 @@ struct QueryMatch{Q<:AbstractQuery,Doc<:Document,D,I}
 end
 
 """
-    Query <: AbstractQuery
+    Query(text::AbstractString; replacements=AUTOMATIC_REPLACEMENTS) <: AbstractQuery
 
 A query to search for an exact match of a string,
 with one field:
@@ -70,11 +71,13 @@ with one field:
 * `text::String`
 
 The `text` is automatically processed by applying the replacements
-from [`AUTOMATIC_REPLACEMENTS`](@ref).
+from `replacements` (which defaults to [`AUTOMATIC_REPLACEMENTS`](@ref)).
 """
 struct Query <: AbstractQuery
     text::String
-    Query(str::AbstractString) = new(apply_replacements(str))
+    function Query(text::AbstractString; replacements=AUTOMATIC_REPLACEMENTS)
+        return new(apply_replacements(text; replacements))
+    end
 end
 
 """
@@ -146,7 +149,7 @@ Or(q1::AbstractQuery, q2::AbstractQuery) = Or((q1, q2))
 Base.:(|)(q1::AbstractQuery, q2::AbstractQuery) = Or(q1, q2)
 
 """
-    FuzzyQuery{D,T} <: AbstractQuery
+    FuzzyQuery(text, dist, threshold; replacements=AUTOMATIC_REPLACEMENTS) <: AbstractQuery
 
 A query to search for an fuzzy match of a string,
 with three fields:
@@ -155,15 +158,16 @@ with three fields:
 * `dist::D`: the distance measure to use; defaults to `DamerauLevenshtein()`
 * `threshold::T`: the maximum threshold allowed for a match; defaults to 2.
 
-The `text` is automatically processed by applying the replacements
-from [`AUTOMATIC_REPLACEMENTS`](@ref).
+The `text` is automatically processed by applying the replacements `replacements`
+(which defaults to [`AUTOMATIC_REPLACEMENTS`](@ref)).
 """
 struct FuzzyQuery{D,T} <: AbstractQuery
     text::String
     dist::D
     threshold::T
-    function FuzzyQuery(str::AbstractString, dist::D, threshold::T) where {D,T}
-        return new{D,T}(apply_replacements(str), dist, threshold)
+    function FuzzyQuery(text::AbstractString, dist::D, threshold::T;
+                        replacements=AUTOMATIC_REPLACEMENTS) where {D,T}
+        return new{D,T}(apply_replacements(text; replacements), dist, threshold)
     end
 end
 
