@@ -37,7 +37,7 @@ true
 
 julia> Tables.schema(Tables.rowtable(matches))
 Tables.Schema:
- :document       Document{NamedTuple{(:document_name,),Tuple{String}}}
+ :document       Document{NamedTuple{(:document_name,), Tuple{String}}}
  :distance       Int64
  :indices        UnitRange{Int64}
  :query          Query

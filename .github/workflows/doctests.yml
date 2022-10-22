@@ -4,20 +4,36 @@ on:
     branches:
       - 'main'
       - /^release-.*$/
-    tags: '*'
+    tags: ['*']
   pull_request:
 jobs:
   doctests:
-    name: Doctests (Julia ${{ matrix.julia-version }} - ${{ github.event_name }})
+    name: Doctests (Julia 1.6.2 - ${{ github.event_name }} - ${{ matrix.filter_mode }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        julia-version: [1.6.1]
+        include:
+          # We run and generate github suggestions on anywhere in the
+          # diff of the PR.
+          # We don't fail if there is a suggestion to make because we want
+          # to continue to the next step.
+          - fail_on_error: false
+            filter_mode: 'diff_context'
+
+          # We run once with no filter. That means we get
+          # "annotations" instead of suggestions (toggle them by pressing `a`
+          # while viewing the PR) and they can't be committed, but they can
+          # occur anywhere, not just in the diff of the PR. This time,
+          # we fail if there were any, because it means the doctests did not pass.
+          - fail_on_error: true
+            filter_mode: 'nofilter'
+
     steps:
       - uses: julia-actions/setup-julia@latest
         with:
-          version: ${{ matrix.julia-version }}
-      - uses: actions/checkout@v1
+          version: 1.6.2
+      - uses: actions/checkout@v2
       - name: Install dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Fix doctests
@@ -26,8 +42,10 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           file: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: reviewdog/action-suggester@v1
         if: github.event_name == 'pull_request'
         with:
           tool_name: Documenter (doctests)
-          fail_on_error: true
+          fail_on_error: ${{ matrix.fail_on_error }}
+          filter_mode: ${{ matrix.filter_mode }}
